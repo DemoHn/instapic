@@ -1,0 +1,15 @@
+venv/
+
+# since I copied the requirement doc on the project root which should not be disclosed..
+ReapRequirement.md
+
+.vscode
+*.pyc
+__pycache__/
+instance/
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
