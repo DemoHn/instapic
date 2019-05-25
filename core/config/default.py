@@ -5,5 +5,6 @@ def load_default():
   #   2. check env, override DefaultConfig() from corresponding files
   #   3. those config (e.g. StagingConfig() ) will automatically load .env file to override their config
   return {    
-    'SQLALCHEMY_DATABASE_URI': 'sqlite:///data/db.sqlite',    
+    'SQLALCHEMY_DATABASE_URI': 'sqlite:///data/db.sqlite',
+    'SQLALCHEMY_TRACK_MODIFICATIONS': False,    
   }
