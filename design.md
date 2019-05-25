@@ -9,7 +9,7 @@ Models:
 - created_at
 - updated_at
 
-2. user_token
+2. user_session
 
 - id
 - user_id
