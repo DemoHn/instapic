@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, jsonify
 
 def create_app(test_config=None):
     # create and configure the app
@@ -7,7 +7,8 @@ def create_app(test_config=None):
 
     app.config.from_mapping(
         SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
+        DATA_PATH='data',
+        DATABASE=os.path.join('data', 'core.sqlite'),
     )
 
     if test_config is None:
@@ -19,14 +20,14 @@ def create_app(test_config=None):
 
     # ensure the instance folder exists
     try:
-        os.makedirs(app.instance_path)
+        os.makedirs('data')
+        os.makedirs('data/images')
     except OSError:
         pass
 
-    print('diu')
-    # a simple page that says hello
-    @app.route('/hello')
+    # a simple page for health checking
+    @app.route('/healthz')
     def hello():
-        return 'Hello, World!'
+        return jsonify(status='OK')
 
     return app

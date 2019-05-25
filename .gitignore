@@ -3,6 +3,8 @@ venv/
 # since I copied the requirement doc on the project root which should not be disclosed..
 ReapRequirement.md
 
+data/
+
 .vscode
 *.pyc
 __pycache__/

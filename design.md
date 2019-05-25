@@ -34,3 +34,5 @@ Models:
 - id
 - post_id
 - image_id
+
+How to run: `FLASK_APP=core FLASK_ENV=dev flask run`
