@@ -5,6 +5,7 @@ from flask import jsonify, request
 @swag_from('specs/register.yml', validation=True)
 def register():
   content = request.json
+  print(user_service.app)
   print(content['name'])
   return jsonify(name=content['name'])
 

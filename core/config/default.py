@@ -7,5 +7,7 @@ def load_default():
   return {    
     'SQLALCHEMY_DATABASE_URI': 'sqlite:///data/db.sqlite',
     'SECRET_KEY': '<secret>',
-    'SQLALCHEMY_TRACK_MODIFICATIONS': False,    
+    # python pbkdf2 config
+    'PBKDF2_ITERATION_TIMES': 1000,
+    'SQLALCHEMY_TRACK_MODIFICATIONS': False,
   }
