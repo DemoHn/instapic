@@ -1,7 +1,7 @@
 import os
 from flask import Flask, jsonify
 from .config import load_config
-from .models import load_models
+from .models import db, load_models
 
 def create_app(test_config=None):
     # create and configure the app
@@ -14,6 +14,7 @@ def create_app(test_config=None):
 
     with app.app_context():
         load_models(app)
+
     # ensure the instance folder exists
     try:
         os.makedirs('data')
