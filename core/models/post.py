@@ -9,7 +9,7 @@ class Post(db.Model):
   description = db.Column(db.Text, nullable=True)
   
   # created_at
-  created_at = db.Column(db.DateTime, nullable=False)
-  
+  created_at = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
+
   # updated_at
-  updated_at = db.Column(db.DateTime, nullable=False)
+  updated_at = db.Column(db.DateTime, nullable=False, server_default=db.func.now(), server_onupdate=db.func.now())
