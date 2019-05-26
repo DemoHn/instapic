@@ -1,4 +1,7 @@
 from flask import Blueprint, jsonify
+from flasgger import Swagger
+from flasgger.utils import swag_from
+
 from core.utils import import_all_submodules
 import importlib
 
@@ -9,6 +12,7 @@ def load_routes(app):
   import_all_submodules(__file__, __name__)
   app.register_blueprint(api)
 
+  Swagger(app)
   # register misc routes
   @app.route('/healthz')
   def health_check():

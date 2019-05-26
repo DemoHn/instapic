@@ -1,0 +1,34 @@
+Register a new account via user & password.
+---
+tags:
+  - users
+consumes:
+  - application/json
+parameters:
+  - in: body
+    name: request
+    required: true    
+    schema:
+      type: object
+      id: User
+      required:
+        - name
+        - password
+      properties:
+        name:
+          type: string
+          description: username. should be registered only once.
+          example: Nigshoxiz
+        password:
+          type: string
+          description: password.
+          example: P@ssw0rd
+responses:
+  200:
+    description: returns a token
+    schema:      
+      properties:
+        token:
+          type: string
+          description: add this token to `Authorization` header for further request
+          default: '122mofs20Qf_#4'

@@ -9,8 +9,11 @@ def load_config(app):
   flask_env = os.environ['FLASK_ENV']
   config_map = {
     'stag': load_stag,
+    'staging': load_stag,
     'prod': load_prod,
+    'production': load_prod,
     'dev': load_dev,
+    'development': load_dev,
   }
   # load default config
   default_config = load_default()

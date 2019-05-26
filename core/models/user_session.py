@@ -7,7 +7,7 @@ class UserSession(db.Model):
 
   # user_id, no foreign key with user_id for better migration and
   # testing, but it requires carefully checking (whether user exists) on service layer!
-  user_id = db.Column(db.Integer, nullable=False)
+  user_id = db.Column(db.Integer, nullable=False) 
   
   # user token, can be existed for many times for one user
   token = db.Column(db.String(255), unique=False, nullable=False)

@@ -1,5 +1,6 @@
 import os
 from flask import Flask, jsonify
+
 from .config import load_config
 from .models import db, load_models
 from .routes import load_routes

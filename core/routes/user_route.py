@@ -1,8 +1,12 @@
-from . import api
+from . import api, swag_from
+from flask import jsonify, request
 
-@api.route('/users/register')
+@api.route('/users/register', methods=['POST'])
+@swag_from('specs/register.yml', validation=True)
 def register():
-  return 'OK'
+  content = request.json
+  print(content['name'])
+  return jsonify(name=content['name'])
 
 @api.route('/users/login')
 def login():
