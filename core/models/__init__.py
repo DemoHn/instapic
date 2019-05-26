@@ -10,3 +10,5 @@ def load_models(app):
   
   db.init_app(app)
   db.create_all()
+
+  return db

@@ -13,7 +13,7 @@ class Image(db.Model):
   thumbnail_url = db.Column(db.Text, nullable=False)
   
   # created_at
-  created_at = db.Column(db.DateTime, nullable=False)
-  
+  created_at = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
+
   # updated_at
-  updated_at = db.Column(db.DateTime, nullable=False)
+  updated_at = db.Column(db.DateTime, nullable=False, server_default=db.func.now(), server_onupdate=db.func.now())

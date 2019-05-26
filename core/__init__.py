@@ -2,6 +2,7 @@ import os
 from flask import Flask, jsonify
 from .config import load_config
 from .models import db, load_models
+from .routes import load_routes
 
 def create_app(test_config=None):
     # create and configure the app
@@ -12,9 +13,6 @@ def create_app(test_config=None):
         # load the test config if passed in
         app.config.from_mapping(test_config)
 
-    with app.app_context():
-        load_models(app)
-
     # ensure the instance folder exists
     try:
         os.makedirs('data')
@@ -22,9 +20,8 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # a simple page for health checking
-    @app.route('/healthz')
-    def hello():
-        return jsonify(status='OK')
+    with app.app_context():
+        load_models(app)
+        load_routes(app)
 
     return app
