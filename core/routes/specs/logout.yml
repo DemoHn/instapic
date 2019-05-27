@@ -1,0 +1,9 @@
+Remove token and logout
+---
+tags:
+  - users
+consumes:
+  - application/json
+responses:
+  200:
+    description: return nothing

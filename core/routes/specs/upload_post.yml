@@ -1,0 +1,73 @@
+Upload a new post
+---
+tags:
+  - posts
+consumes:
+  - application/json
+parameters:
+  - in: body
+    name: request
+    required: true    
+    schema:
+      type: object
+      id: PostRequest
+      required:
+        - image_ids
+      properties:
+        image_ids:
+          type: array
+          items:
+            type: integer
+            description: image id. maximum 4 images.
+            example: 120
+        description:
+          type: string
+          description: post description
+          example: This is Donald Trump's image when he was a young guy living in New York.
+responses:
+  200:
+    description: returns a post
+    schema:      
+      $ref: '#/definitions/Post'
+definitions:
+  User:
+    type: object
+    required:
+      - name
+    properties:
+      id:
+        type: integer
+        description: user id
+        example: 250
+      name:
+        type: string
+        description: user name
+        example: brannn      
+  Post:
+    type: object
+    required:
+      - user
+      - id
+      - images
+      - description
+      - created_at
+    properties:
+      user:
+        $ref: '#/definition/User'
+      id:
+        type: integer
+        example: 1
+      image_urls:
+        type: array
+        items:
+          type: string
+          description: image url
+          example: /images/xxx.png
+      description:
+        type: string
+        description: post description
+        example: Hello, World
+      created_at:
+        type: integer
+        example: 12398534532000
+        description: post creation timestamp (in msec)

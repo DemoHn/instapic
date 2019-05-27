@@ -1,0 +1,75 @@
+List all posts.
+---
+tags:
+  - posts
+consumes:
+  - application/json
+parameters:
+  - in: query
+    name: cursor
+    type: integer
+    description: post cursor to get next page of posts
+  - in: query
+    name: limit
+    type: integer
+    default: 10
+responses:
+  200:
+    description: returns posts' list
+    schema:
+      required:
+        - has_more
+        - posts
+      properties:
+        cursor:
+          type: integer
+          example: 120
+        has_more:
+          type: boolean
+          example: true
+        posts:
+          type: array
+          items:
+            $ref: '#/definitions/Post'
+definitions:
+  User:
+    type: object
+    required:
+      - name
+    properties:
+      id:
+        type: integer
+        description: user id
+        example: 250
+      name:
+        type: string
+        description: user name
+        example: brannn      
+  Post:
+    type: object
+    required:
+      - user
+      - id
+      - images
+      - description
+      - created_at
+    properties:
+      user:
+        $ref: '#/definition/User'
+      id:
+        type: integer
+        example: 1
+      image_urls:
+        type: array
+        items:
+          type: string
+          description: image url
+          example: /images/xxx.png
+      description:
+        type: string
+        description: post description
+        example: Hello, World
+      created_at:
+        type: integer
+        example: 12398534532000
+        description: post creation timestamp (in msec)

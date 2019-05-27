@@ -9,6 +9,13 @@ def register():
   print(content['name'])
   return jsonify(name=content['name'])
 
-@api.route('/users/login')
+@api.route('/users/login', methods=['POST'])
+@swag_from('specs/login.yml', validation=True)
 def login():
   return 'LOGIN'
+
+@api.route('/users/logout', methods=['GET'])
+@swag_from('specs/logout.yml', validation=False)
+def logout():
+  # return empty json value
+  return jsonify()

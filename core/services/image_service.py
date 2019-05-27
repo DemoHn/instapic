@@ -19,13 +19,12 @@ ALLOWED_IMAGE_TYPES = [
 # For simplicity, we only stores raw images on local server's data/ folder
 # although we recommended you to use some third-pary provider (e.g. S3) to host
 # images.
-def upload_image(user, file):
+def upload_image(user_id, file):
   # get config
   use_local_provider = app.config['USE_LOCAL_IMAGE_PROVIDER']
   data_dir = app.config['LOCAL_IMAGE_DATADIR']
   image_url_prefix = app.config['IMAGE_URL_PREFIX']
 
-  orig_filename, ext = os.path.splitext(file.filename)
   # simple image validation by checking its mime type
   # here we choose to trust the program
   mime_type = file.content_type
@@ -36,12 +35,23 @@ def upload_image(user, file):
     # TODO: implement for 3rd-party providers like S3
     raise NotImplementedException('image service')
 
+  new_filename = store_file(file)
+  image_url = image_url_prefix + new_filename
+  store_image_db(user_id, image_url)
+  return image_url
+
+# private functions
+def store_file(file):
+  orig_filename, ext = os.path.splitext(file.filename)
   new_filename = '%s%s' % (generate_random_hash(orig_filename), ext)
   store_path = os.path.join(data_dir, new_filename)
-  access_url = image_url_prefix + new_filename
-
   file.save(store_path)
-  return access_url
+  return new_filename
+
+def store_image_db(user_id, image_url):
+  new_image = Image(user_id=user_id, thumbnail_url=image_url, detail_url=image_url)
+  db.session.add(new_image)
+  db.session.commit()
 
 def generate_random_hash(filename):  
   millis = int(round(time.time() * 1000))
