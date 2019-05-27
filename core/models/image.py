@@ -5,6 +5,9 @@ class Image(db.Model):
   # id: the primary key
   id = db.Column(db.Integer, primary_key=True)
 
+  # record which user has uploaded this image
+  user_id = db.Column(db.Integer, nullable=False)
+
   # for performance consideration, we separate a image to 2 part:
   #    1) detail, stores the original image
   #    2) thumbnail, stores the compressed image for preview

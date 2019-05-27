@@ -22,7 +22,7 @@ def connect_db():
 
 def test_create_image(connect_db):
   cdb = connect_db
-  new_image = Image(detail_url='detail_url', thumbnail_url='thumbnail_url')
+  new_image = Image(user_id=1, detail_url='detail_url', thumbnail_url='thumbnail_url')
 
   cdb.session.add(new_image)
   cdb.session.commit()
@@ -44,7 +44,7 @@ def test_ensure_url_nonempty(connect_db):
 def test_delete(connect_db):
   s = connect_db.session
 
-  new_image = Image(detail_url='1', thumbnail_url='2')
+  new_image = Image(user_id=1, detail_url='1', thumbnail_url='2')
   # create data first
   s.add(new_image)
   s.commit()

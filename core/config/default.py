@@ -9,5 +9,10 @@ def load_default():
     'SECRET_KEY': '<secret>',
     # python pbkdf2 config
     'PBKDF2_ITERATION_TIMES': 1000,
+    'USE_LOCAL_IMAGE_PROVIDER': True,
+    # valid only if 'USE_LOCAL_IMAGE_PROVIDER' = True
+    'LOCAL_IMAGE_DATADIR': 'data/images',
+    'IMAGE_URL_PREFIX': 'images/',
+    'MAX_CONTENT_LENGTH': 32 * 1024 * 1024, # 32M
     'SQLALCHEMY_TRACK_MODIFICATIONS': False,
   }

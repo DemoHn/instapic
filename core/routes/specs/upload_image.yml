@@ -1,0 +1,20 @@
+Uplaod an image to server and return its access link.
+---
+tags:
+  - images
+consumes:
+  - multipart/form-data
+parameters:
+  - in: formData
+    name: image
+    type: file
+    description: the file upload
+responses:
+  200:
+    description: returns its access url
+    schema:
+      properties:
+        url:
+          type: string
+          description: access url
+          default: images/2138525345f2a3d_png
