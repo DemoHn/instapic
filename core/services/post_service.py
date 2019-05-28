@@ -33,7 +33,8 @@ def create_post(user_id, image_ids, description):
   except:
     raise SQLExecutionException('create post')
   
-  return get_post_response(post_id)
+  post = post_scope_query().filter(Post.id == post_id)
+  return transto_post_response(post)
 
 def get_all_posts(limit, cursor):
   pass
@@ -45,8 +46,8 @@ def get_user_posts(user_id, limit, cursor):
 # validations
 def validate_image_ids(user_id, image_ids):
   valid_image_ids = db.session.query(Image).filter(
-    Image.id.in_(image_ids),
-    Image.user_id == user_id
+    Image.user_id == user_id,
+    Image.id.in_(image_ids)
   ).all()
 
   # get valid image ID tuple
@@ -66,15 +67,9 @@ def validate_image_items(image_ids):
   min_images = app.config['IMAGE_MIN_ITEMS']
 
   if len(image_ids) > max_images:
-    raise ValidationException('image items exceeds max limit: %d', max_images, ['image-greater-max', max_images])
+    raise ValidationException('image items exceeds max limit: %d' % max_images, ['image-greater-max', max_images])
   if len(image_ids) < min_images:
-    raise ValidationException("image items lower than min limit: %d", min_images, ['image-lower-min', min_images])
-  pass
-
-# transform username to a valid userword by replacing
-# some special characters: e.g. (space), /, &, %, etc.
-# to '_' universally
-def transform_username(user):
+    raise ValidationException("image items lower than min limit: %d" % min_images, ['image-lower-min', min_images])
   pass
 
 # validate if a userword is valid or not
@@ -84,8 +79,19 @@ def transform_username(user):
 def validate_userword(userword):
   pass
 
-# get single post response by post_id
-# notice: this involves SQL calls, so it's not suitable
-# to be used on listing APIs like `get_all_posts`
-def get_post_response(post_id):
+# transform username to a valid userword by replacing
+# some special characters: e.g. (space), /, &, %, etc.
+# to '_' universally
+def transform_username(user):
   pass
+
+# get single post response by post object
+def transto_post_response(post):
+  # TODO  
+  return post
+
+def post_scope_query():
+  return (db.session.query(Post)
+    .join(Post.images)  
+    .join(PostImage.image)  
+    .join(Post.user))

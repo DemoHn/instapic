@@ -50,13 +50,17 @@ definitions:
       name:
         type: string
         description: user name
-        example: brannn      
+        example: brannn
+      userword:
+        type: string
+        description: a special combination of user id and name to avoid iterate users bruptly.
+        example: Hong_Kong_Journalist-120   
   Post:
     type: object
     required:
       - user
       - id
-      - images
+      - image_urls
       - description
       - created_at
     properties:

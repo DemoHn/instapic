@@ -16,3 +16,6 @@ class PostImage(db.Model):
 
   # updated_at
   updated_at = db.Column(db.DateTime, nullable=False, server_default=db.func.now(), server_onupdate=db.func.now())
+
+  # relationship
+  image = db.relationship('Image', foreign_keys=[image_id], primaryjoin='PostImage.image_id == Image.id', uselist=False)

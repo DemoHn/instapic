@@ -1,6 +1,11 @@
 import pytest
 from core import create_app
-from core.services.user_service import generate_hash, verify_hash, register, generate_random_token
+from core.services.user_service import (
+  generate_hash,
+  verify_hash,
+  register,
+  generate_random_token
+)
 test_config = {
   'SECRET_KEY': '<secret>',
   'TESTING': True,
