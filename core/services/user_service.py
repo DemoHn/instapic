@@ -68,6 +68,10 @@ def login(name, password):
   
   return token
 
+def remove_token(user_id):
+  db.session.query(UserSession).filter_by(user_id=user_id).delete()
+  db.session.commit()
+  
 # private functions (helpers)
 def generate_hash(password):
   iterations = app.config['PBKDF2_ITERATION_TIMES']

@@ -11,6 +11,8 @@ def load_prod():
     'LOCAL_IMAGE_DATADIR': 'data/images',
     'IMAGE_URL_PREFIX': 'images/',
     'MAX_CONTENT_LENGTH': 128 * 1024 * 1024, # 128M
+    'IMAGE_MAX_ITEMS': 4,
+    'IMAGE_MIN_ITEMS': 1,
     'SQLALCHEMY_DATABASE_URI': os.environ['DATABASE_URI']
   }
   

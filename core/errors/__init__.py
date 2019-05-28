@@ -14,7 +14,16 @@ class NotImplementedException(BaseException):
     super().__init__(message + ' not implemented')
 
 class ValidationException(BaseException):
-  def __init__(self, message):
+  def __init__(self, message, data):
     self.status_code = 400
     self.error_code = 10001
     super().__init__(message)
+
+    self.data = data
+
+# sql
+class SQLExecutionException(BaseException):
+  def __init__(self, tag):
+    self.status_code = 500
+    self.error_code = 20000
+    super().__init__('sql execution error: %s', tag)

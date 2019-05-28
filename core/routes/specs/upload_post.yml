@@ -27,7 +27,7 @@ parameters:
 responses:
   200:
     description: returns a post
-    schema:      
+    schema:
       $ref: '#/definitions/Post'
 definitions:
   User:

@@ -11,5 +11,7 @@ def load_stag():
     'LOCAL_IMAGE_DATADIR': 'data/images',
     'IMAGE_URL_PREFIX': 'images/',
     'MAX_CONTENT_LENGTH': 12 * 1024 * 1024, # 12M
+    'IMAGE_MAX_ITEMS': 4,
+    'IMAGE_MIN_ITEMS': 1,
     'SQLALCHEMY_DATABASE_URI': os.environ['DATABASE_URI']
   }

@@ -4,6 +4,7 @@ from flask import jsonify, request
 @api.route('/posts', methods=['POST'])
 @swag_from('specs/upload_post.yml', validation=True)
 def submit_new_post():
+  content = request.json
   pass
 
 @api.route('/posts', methods=['GET'])

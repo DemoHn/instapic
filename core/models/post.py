@@ -5,6 +5,9 @@ class Post(db.Model):
   # id: post id, the primary key
   id = db.Column(db.Integer, primary_key=True)
 
+  # post create user
+  user_id = db.Column(db.Integer, nullable=False)
+  
   # description: a detailed text edited by user for this post
   description = db.Column(db.Text, nullable=True)
   
