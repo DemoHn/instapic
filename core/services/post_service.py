@@ -44,20 +44,42 @@ def create_post(user_id, image_ids, description):
 def get_posts(limit, cursor, user_id=None):
   max_limit = app.config['MAX_FETCH_LIMIT']
   has_more = False
-  subquery = post_scope_query()
+
+  # get all posts first
+  subquery = db.session.query(Post).join(Post.user)
   if cursor:
     subquery = subquery.filter(Post.id < cursor)
   if user_id:
     subquery = subquery.filter(Post.user_id == user_id)
 
-  ac_limit = (limit or max_limit) + 1
+  # set limit number, to get `has_more`, we add one item when query
+  lm_limit = (limit or max_limit)
+  if lm_limit > max_limit:
+    lm_limit = max_limit
+  ac_limit = lm_limit + 1
   m_posts = subquery.order_by(desc(Post.created_at)).limit(ac_limit).all()  
   
   if len(m_posts) == ac_limit:
     has_more = True
     # remove last item
     m_posts = m_posts[:-1]
-    
+  
+  # get all ids
+  m_post_ids = [m_post.id for m_post in m_posts]  
+  # query PostImage
+  m_post_images = (db.session.query(PostImage)
+    .join(PostImage.image)
+    .filter(Post.id.in_(m_post_ids))
+    .all())
+  
+  # map post_images info to posts
+  for m_post in m_posts:
+    m_post.posts = []
+    for m_post_image in m_post_images:
+      if m_post_image.post_id == m_post.id:
+        m_post.posts.append(m_post_image)
+        break
+
   return {
     'cursor': m_posts[-1].id,
     'has_more': has_more,

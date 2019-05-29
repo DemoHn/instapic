@@ -5,6 +5,7 @@ from core.services.post_service import (
   get_posts,
   validate_userword
 )
+import jsonschema
 
 @api.route('/posts', methods=['POST'])
 @swag_from('specs/upload_post.yml', validation=True)
@@ -12,13 +13,15 @@ def submit_new_post():
   user_id = 1 # TODO
   content = request.json
   post = create_post(user_id, content['image_ids'], content['description'])
-  return jsonify(post)  
+  return jsonify(post)
 
 @api.route('/posts', methods=['GET'])
-@swag_from('specs/list_posts.yml', validation=True)
+@swag_from('specs/list_posts.yml')
 def list_all_posts():
-  limit = request.args.get('limit')
-  cursor = request.args.get('cursor')
+  # since flasgger could not validate query parameters,
+  # we have to manually validate it
+  limit = request.args.get('limit', type=int)  
+  cursor = request.args.get('cursor', type=int)
 
   posts = get_posts(limit, cursor)  
   return jsonify(posts)
@@ -26,11 +29,10 @@ def list_all_posts():
 # userword = <username>-<user_id>
 # e.g. Hong-Kong-Journalist-120
 @api.route('/posts/<userword>', methods=['GET'])
-@swag_from('specs/list_user_posts.yml', validation=True)
+@swag_from('specs/list_user_posts.yml')
 def list_user_posts(userword):
-  limit = request.args.get('limit')
-  cursor = request.args.get('cursor')
-  print(userword)
+  limit = request.args.get('limit', type=int)
+  cursor = request.args.get('cursor', type=int)
 
   # validate to get user_id
   uploader_id = validate_userword(userword)
