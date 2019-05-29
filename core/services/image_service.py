@@ -43,6 +43,10 @@ def upload_image(user_id, file):
     'url': image_url
   }
 
+def get_image_path(image_name):
+  data_dir = app.config['LOCAL_IMAGE_DATADIR']
+  return os.path.join(data_dir, image_name)
+
 # private functions
 def store_file(file, data_dir):
   orig_filename, ext = os.path.splitext(file.filename)
