@@ -37,8 +37,11 @@ def upload_image(user_id, file):
 
   new_filename = store_file(file)
   image_url = image_url_prefix + new_filename
-  store_image_db(user_id, image_url)
-  return image_url
+  img = store_image_db(user_id, image_url)
+  return {
+    'id': img.id,
+    'url': image_url
+  }
 
 # private functions
 def store_file(file):
@@ -53,7 +56,9 @@ def store_image_db(user_id, image_url):
   db.session.add(new_image)
   db.session.commit()
 
+  return new_image
+
 def generate_random_hash(filename):  
   millis = int(round(time.time() * 1000))
   raw_str = '%s:%d:%d' % (filename, millis, random.randint(1, 1e4))
-  return hashlib.md5(raw_str.encode()).hexdigest()  
+  return hashlib.md5(raw_str.encode()).hexdigest()

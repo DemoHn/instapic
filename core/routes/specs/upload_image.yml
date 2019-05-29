@@ -14,6 +14,10 @@ responses:
     description: returns its access url
     schema:
       properties:
+        id:
+          type: integer
+          description: image id
+          default: 1
         url:
           type: string
           description: access url

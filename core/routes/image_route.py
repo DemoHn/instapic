@@ -12,7 +12,7 @@ def upload_image_ctrl():
     raise ValidationException('`image` field is empty!')
 
   user_id = 1 # TODO: use auth
-  file = request.files['image']
-  image_url = upload_image(user_id, file)
+  f = request.files['image']
+  img_data = upload_image(user_id, f)
 
-  return jsonify(url=image_url)  
+  return jsonify(url=img_data['url'], id=img_data['id'])

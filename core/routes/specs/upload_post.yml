@@ -7,7 +7,7 @@ consumes:
 parameters:
   - in: body
     name: request
-    required: true    
+    required: true
     schema:
       type: object
       id: PostRequest

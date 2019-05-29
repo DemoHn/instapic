@@ -16,5 +16,6 @@ def load_default():
     'MAX_CONTENT_LENGTH': 32 * 1024 * 1024, # 32M
     'IMAGE_MAX_ITEMS': 4,
     'IMAGE_MIN_ITEMS': 1,
+    'MAX_FETCH_LIMIT': 10,
     'SQLALCHEMY_TRACK_MODIFICATIONS': False,
   }

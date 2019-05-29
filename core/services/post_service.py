@@ -1,5 +1,6 @@
 from core.models import db
 from core.models.post import Post
+from core.models.user import User
 from core.models.post_image import PostImage
 from core.models.image import Image
 from core.errors import (
@@ -8,6 +9,7 @@ from core.errors import (
 )
 
 from flask import current_app as app
+import re
 
 def create_post(user_id, image_ids, description):
   # validate if upload image ids are valid and 
@@ -36,11 +38,28 @@ def create_post(user_id, image_ids, description):
   post = post_scope_query().filter(Post.id == post_id)
   return transto_post_response(post)
 
-def get_all_posts(limit, cursor):
-  pass
+def get_posts(limit, cursor, user_id):
+  max_limit = app.config['MAX_FETCH_LIMIT']
+  has_more = False
+  subquery = post_scope_query()
+  if cursor:
+    subquery = subquery.filter(Post.id < cursor)
+  if user_id:
+    subquery = subquery.filter(Post.user_id == user_id)
 
-def get_user_posts(user_id, limit, cursor):
-  pass
+  ac_limit = (limit or max_limit) + 1
+  m_posts = subquery.order_by('created_at desc').limit(ac_limit).all()  
+  
+  if len(m_posts) == ac_limit:
+    has_more = True
+    # remove last item
+    m_posts = m_posts[:-1]
+    
+  return {
+    'cursor': m_posts[-1].id,
+    'has_more': has_more,
+    'posts': map(transto_post_response, m_posts)
+  }
 
 # private functions
 # validations
@@ -77,17 +96,42 @@ def validate_image_items(image_ids):
 # <username>-<user_id>
 # e.g. Hong_Kong_Journallist-120
 def validate_userword(userword):
-  pass
+  results = re.findall(r'^(.+)-([0-9]+)$', userword)
+  if len(results) == 0:
+    raise ValidationException('invalid userword: %s', userword, ['invalid-userword', userword])
+  else:
+    t_username, user_id = int(results[0])
+    user = db.session.query(User).filter_by(id=user_id)
+
+    if user is None:
+      raise ValidationException('user id: %d not found' % user_id, ['user-notfound', user_id])
+    if t_username != transform_username(user.name):
+      raise ValidationException('invalid userword: %d' % t_username)
+  
+  return user_id
 
 # transform username to a valid userword by replacing
 # some special characters: e.g. (space), /, &, %, etc.
 # to '_' universally
-def transform_username(user):
-  pass
+def transform_username(username):
+  return re.sub(r'[$&+,/:;=\\?@ \'<>#%"]', '_', username)  
 
 # get single post response by post object
 def transto_post_response(post):
-  # TODO  
+  image_urls = []
+  for image_m in post.images:
+    image_urls.append(image_m.thumbnail_url)
+  return {
+    'id': post.id,
+    'user': {
+      'id': post.user.id,
+      'name': post.user.name,
+      'userword': '%s-%d' % (transform_username(post.user.name), post.user.id)
+    },
+    'image_urls': image_urls,
+    'description': post.description,
+    'created_at': post.created_at
+  }
   return post
 
 def post_scope_query():

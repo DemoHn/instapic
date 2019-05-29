@@ -13,6 +13,7 @@ def load_prod():
     'MAX_CONTENT_LENGTH': 128 * 1024 * 1024, # 128M
     'IMAGE_MAX_ITEMS': 4,
     'IMAGE_MIN_ITEMS': 1,
+    'MAX_FETCH_LIMIT': 15,
     'SQLALCHEMY_DATABASE_URI': os.environ['DATABASE_URI']
   }
   
