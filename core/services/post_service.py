@@ -9,7 +9,9 @@ from core.errors import (
 )
 
 from flask import current_app as app
+from sqlalchemy import desc
 import re
+import time
 
 def create_post(user_id, image_ids, description):
   # validate if upload image ids are valid and 
@@ -21,10 +23,12 @@ def create_post(user_id, image_ids, description):
   try:
     # all data is valid, so let's add data!
     # add post
-    new_post = Post(user_id=user_id, description=description)
-    post_id = new_post.id
+    new_post = Post(user_id=user_id, description=description)    
     db.session.add(new_post)
     db.session.commit()
+
+    # get new post id
+    post_id = new_post.id
     # add data on `post_image` table
     post_image_data = []
     for image_id in image_ids:
@@ -33,12 +37,11 @@ def create_post(user_id, image_ids, description):
     db.session.bulk_save_objects(post_image_data)
     db.session.commit()
   except:
-    raise SQLExecutionException('create post')
-  
-  post = post_scope_query().filter(Post.id == post_id)
+    raise SQLExecutionException('create post')  
+  post = post_scope_query().filter(Post.id == post_id).first()
   return transto_post_response(post)
 
-def get_posts(limit, cursor, user_id):
+def get_posts(limit, cursor, user_id=None):
   max_limit = app.config['MAX_FETCH_LIMIT']
   has_more = False
   subquery = post_scope_query()
@@ -48,7 +51,7 @@ def get_posts(limit, cursor, user_id):
     subquery = subquery.filter(Post.user_id == user_id)
 
   ac_limit = (limit or max_limit) + 1
-  m_posts = subquery.order_by('created_at desc').limit(ac_limit).all()  
+  m_posts = subquery.order_by(desc(Post.created_at)).limit(ac_limit).all()  
   
   if len(m_posts) == ac_limit:
     has_more = True
@@ -58,7 +61,7 @@ def get_posts(limit, cursor, user_id):
   return {
     'cursor': m_posts[-1].id,
     'has_more': has_more,
-    'posts': map(transto_post_response, m_posts)
+    'posts': list(map(transto_post_response, m_posts))
   }
 
 # private functions
@@ -100,9 +103,9 @@ def validate_userword(userword):
   if len(results) == 0:
     raise ValidationException('invalid userword: %s', userword, ['invalid-userword', userword])
   else:
-    t_username, user_id = int(results[0])
-    user = db.session.query(User).filter_by(id=user_id)
-
+    t_username, user_id = results[0]
+    user_id = int(user_id)
+    user = db.session.query(User).filter_by(id=user_id).first()
     if user is None:
       raise ValidationException('user id: %d not found' % user_id, ['user-notfound', user_id])
     if t_username != transform_username(user.name):
@@ -114,13 +117,15 @@ def validate_userword(userword):
 # some special characters: e.g. (space), /, &, %, etc.
 # to '_' universally
 def transform_username(username):
-  return re.sub(r'[$&+,/:;=\\?@ \'<>#%"]', '_', username)  
+  return re.sub(r'[$&+,/:;=\\?@ \'<>#%"]', '_', username)
 
 # get single post response by post object
 def transto_post_response(post):
   image_urls = []
   for image_m in post.images:
-    image_urls.append(image_m.thumbnail_url)
+    image_urls.append(image_m.image.thumbnail_url)
+
+  create_ts = round(time.mktime(post.created_at.timetuple()) * 1000)
   return {
     'id': post.id,
     'user': {
@@ -130,9 +135,8 @@ def transto_post_response(post):
     },
     'image_urls': image_urls,
     'description': post.description,
-    'created_at': post.created_at
+    'created_at': create_ts
   }
-  return post
 
 def post_scope_query():
   return (db.session.query(Post)

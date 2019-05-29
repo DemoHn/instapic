@@ -20,8 +20,8 @@ def list_all_posts():
   limit = request.args.get('limit')
   cursor = request.args.get('cursor')
 
-  posts = get_posts(limit, cursor)
-  return jsonify(posts)  
+  posts = get_posts(limit, cursor)  
+  return jsonify(posts)
 
 # userword = <username>-<user_id>
 # e.g. Hong-Kong-Journalist-120

@@ -10,7 +10,7 @@ import base58
 import random
 import hashlib
 
-def register(name, password):
+def register_user(name, password):
   password_hash = generate_hash(password)
   # prepare user data
   new_user = User(
@@ -39,7 +39,7 @@ def register(name, password):
     raise e
   return token
 
-def login(name, password):
+def login_user(name, password):
   # find user
   user = db.session.query(User).filter_by(name=name).first()
   if user == None:

@@ -2,15 +2,15 @@ List all posts.
 ---
 tags:
   - posts
-consumes:
-  - application/json
 parameters:
   - in: query
+    required: false
     name: cursor
     type: integer
     description: post cursor to get next page of posts
   - in: query
     name: limit
+    required: false
     type: integer
     default: 10
 responses:

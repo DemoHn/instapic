@@ -35,7 +35,7 @@ def upload_image(user_id, file):
     # TODO: implement for 3rd-party providers like S3
     raise NotImplementedException('image service')
 
-  new_filename = store_file(file)
+  new_filename = store_file(file, data_dir)
   image_url = image_url_prefix + new_filename
   img = store_image_db(user_id, image_url)
   return {
@@ -44,7 +44,7 @@ def upload_image(user_id, file):
   }
 
 # private functions
-def store_file(file):
+def store_file(file, data_dir):
   orig_filename, ext = os.path.splitext(file.filename)
   new_filename = '%s%s' % (generate_random_hash(orig_filename), ext)
   store_path = os.path.join(data_dir, new_filename)
