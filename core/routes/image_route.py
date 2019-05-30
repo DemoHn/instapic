@@ -1,15 +1,16 @@
 from . import api, swag_from
 import os
-from flask import jsonify, request, send_file
+from flask import jsonify, request, send_file, g
 from core.services.image_service import (
   upload_image,
   get_image_path
 )
-
+from core.middlewares import auth
 from core.errors import ValidationException
 from flask import current_app as app
 
 @api.route('/images', methods=['POST'])
+@auth
 @swag_from('specs/upload_image.yml', validation=False)
 def upload_image_ctrl():
   # since the default validation does not work properly (no idea)
@@ -17,7 +18,7 @@ def upload_image_ctrl():
   if 'image' not in request.files:
     raise ValidationException('`image` field is empty!')
 
-  user_id = 1 # TODO: use auth
+  user_id = g.user_id
   f = request.files['image']
   img_data = upload_image(user_id, f)
 

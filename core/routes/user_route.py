@@ -1,10 +1,11 @@
 from . import api, swag_from
-from flask import jsonify, request
+from flask import jsonify, request, g
 from core.services.user_service import (
   register_user,
   login_user,
   remove_token
 )
+from core.middlewares import auth
 
 @api.route('/users/register', methods=['POST'])
 @swag_from('specs/register.yml', validation=True)
@@ -27,10 +28,11 @@ def login():
   return jsonify(token=token)
 
 @api.route('/users/logout', methods=['GET'])
+@auth
 @swag_from('specs/logout.yml', validation=False)
 def logout():
   # return empty json value
-  user_id = None # TODO
+  user_id = g.user_id
   if user_id:
     remove_token(user_id)
   return jsonify()

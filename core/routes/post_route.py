@@ -1,16 +1,18 @@
 from . import api, swag_from
-from flask import jsonify, request
+from flask import jsonify, request,g 
 from core.services.post_service import (
   create_post,
   get_posts,
   validate_userword
 )
+from core.middlewares import auth
 import jsonschema
 
 @api.route('/posts', methods=['POST'])
+@auth
 @swag_from('specs/upload_post.yml', validation=True)
 def submit_new_post():
-  user_id = 1 # TODO
+  user_id = g.user_id
   content = request.json
   post = create_post(user_id, content['image_ids'], content['description'])
   return jsonify(post)

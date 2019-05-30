@@ -21,6 +21,13 @@ class ValidationException(BaseException):
 
     self.data = data
 
+# auth
+class AuthException(BaseException):
+  def __init__(self, message):
+    self.status_code = 401
+    self.error_code = 10200
+
+    super().__init__(message)
 # sql
 class SQLExecutionException(BaseException):
   def __init__(self, tag):
