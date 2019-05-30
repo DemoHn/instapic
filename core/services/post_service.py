@@ -18,7 +18,8 @@ def create_post(user_id, image_ids, description):
   # uploaded by this user
   validate_image_items(image_ids)
   validate_image_ids(user_id, image_ids)
-  
+  validate_desc_length(description)
+
   post_id = None
   try:
     # all data is valid, so let's add data!
@@ -119,6 +120,10 @@ def validate_image_items(image_ids):
     raise ValidationException("image items lower than min limit: %d" % min_images, ['image-lower-min', min_images])
   pass
 
+def validate_desc_length(description):
+  max_length = app.config['MAX_DESCRIPTION_LENGTH']
+  if len(description) > max_length:
+    raise ValidationException('description length exceeds max limit: %d' % max_length, ['image-desc-max', max_length])
 # validate if a userword is valid or not
 # the format of userword:
 # <username>-<user_id>
@@ -165,6 +170,6 @@ def transto_post_response(post):
 
 def post_scope_query():
   return (db.session.query(Post)
-    .join(Post.images)  
+    .join(Post.images)
     .join(PostImage.image)  
     .join(Post.user))

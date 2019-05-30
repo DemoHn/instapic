@@ -18,6 +18,7 @@ def load_dev():
     'MAX_CONTENT_LENGTH': 32 * 1024 * 1024, # 32M
     'IMAGE_MAX_ITEMS': 4,
     'MAX_FETCH_LIMIT': 10,
+    'MAX_DESCRIPTION_LENGTH': 20,
     'IMAGE_MIN_ITEMS': 1,
     'SQLALCHEMY_DATABASE_URI': 'sqlite:///' + current_dir + '/data/db.sqlite',
   }
