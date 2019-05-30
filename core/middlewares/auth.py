@@ -8,7 +8,9 @@ import re
 def auth(f):
   @wraps(f)
   def decorated_auth_func(*args, **kwargs):
-    auth_header = request.headers['authorization']
+    auth_header = request.headers.get('authorization')
+    if auth_header == None:
+      raise AuthException('Authorization header does not exist')
     res = re.findall(r'Bearer (\w+)$', auth_header)
     if len(res) == 0:
       raise AuthException('malformed auth header: maybe missing "Bearer"')

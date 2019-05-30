@@ -79,9 +79,12 @@ def get_posts(limit, cursor, user_id=None):
       if m_post_image.post_id == m_post.id:
         m_post.posts.append(m_post_image)
         break
-
+  # get cursor
+  cursor = None
+  if len(m_posts) > 0:
+    cursor = m_posts[-1].id
   return {
-    'cursor': m_posts[-1].id,
+    'cursor': cursor,
     'has_more': has_more,
     'posts': list(map(transto_post_response, m_posts))
   }
@@ -131,7 +134,7 @@ def validate_userword(userword):
     if user is None:
       raise ValidationException('user id: %d not found' % user_id, ['user-notfound', user_id])
     if t_username != transform_username(user.name):
-      raise ValidationException('invalid userword: %d' % t_username)
+      raise ValidationException('invalid userword: %s' % t_username)
   
   return user_id
 
