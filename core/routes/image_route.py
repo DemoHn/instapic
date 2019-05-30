@@ -19,10 +19,10 @@ def upload_image_ctrl():
     raise ValidationException('`image` field is empty!')
 
   user_id = g.user_id
-  f = request.files['image']
+  f = request.files.get('image')
   img_data = upload_image(user_id, f)
 
-  return jsonify(url=img_data['url'], id=img_data['id'])
+  return jsonify(url=img_data.get('url'), id=img_data.get('id'))
 
 @app.route('/images/<image_name>', methods=['GET'])
 def get_image(image_name):

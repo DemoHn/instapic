@@ -46,3 +46,16 @@ class SQLExecutionException(BaseException):
     super().__init__('sql execution error: %s', tag)
     self.status_code = 500
     self.error_code = 20000
+
+# user
+class UserNotFoundException(BaseException):
+  def __init__(self, message):
+    super().__init__(message)
+    self.status_code = 400
+    self.error_code = 30000
+
+class WrongPasswordException(BaseException):
+  def __init__(self, message):
+    super().__init__(message)
+    self.status_code = 400
+    self.error_code = 30001

@@ -1,7 +1,11 @@
 from core.models import db
 from core.models.user import User
 from core.models.user_session import UserSession
-
+from core.errors import (
+  SQLExecutionException,
+  UserNotFoundException,
+  WrongPasswordException
+)
 from flask import current_app as app
 from pbkdf2 import crypt
 import time
@@ -9,6 +13,8 @@ import os
 import base58
 import random
 import hashlib
+
+
 
 def register_user(name, password):
   password_hash = generate_hash(password)
@@ -22,8 +28,7 @@ def register_user(name, password):
     db.session.add(new_user)
     db.session.commit()
   except Exception as e:
-    # TODO: more specific error
-    raise e
+    raise SQLExecutionException('new user')
   # generate & insert user token  
   token = generate_random_token()
   new_session = UserSession(
@@ -36,19 +41,18 @@ def register_user(name, password):
     db.session.add(new_session)
     db.session.commit()
   except Exception as e:
-    raise e
+    raise SQLExecutionException('new session')
   return token
 
 def login_user(name, password):
   # find user
   user = db.session.query(User).filter_by(name=name).first()
   if user == None:
-    # TODO: more detailed error
-    raise Exception('user not exists')
+    raise UserNotFoundException('user not exists')
 
   # verify password
   if verify_hash(password, user.password_hash) == False:
-    raise Exception('password error')
+    raise WrongPasswordException('wrong password')    
 
   # if verified
   token = generate_random_token()

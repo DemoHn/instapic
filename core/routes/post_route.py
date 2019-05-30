@@ -14,7 +14,7 @@ import jsonschema
 def submit_new_post():
   user_id = g.user_id
   content = request.json
-  post = create_post(user_id, content['image_ids'], content['description'])
+  post = create_post(user_id, content.get('image_ids'), content.get('description'))
   return jsonify(post)
 
 @api.route('/posts', methods=['GET'])
