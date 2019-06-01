@@ -4,7 +4,7 @@ from core.services.post_service import (
   validate_image_ids,
   validate_image_items,
   create_post,
-  get_post_response
+  transto_post_response
 )
 # models
 from core.models import db

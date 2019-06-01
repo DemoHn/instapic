@@ -3,7 +3,7 @@ from core import create_app
 from core.services.user_service import (
   generate_hash,
   verify_hash,
-  register,
+  register_user,
   generate_random_token
 )
 test_config = {
