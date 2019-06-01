@@ -8,7 +8,7 @@ export interface TestProps {
 
 const Test: React.FC<TestProps> = props => {
   return (
-    <div className="Hey">
+    <div className="button">
       <p>
         {props.text} + {props.num}
       </p>
