@@ -1,0 +1,15 @@
+$text-color: rgb(73, 46, 230);
+
+.toggle-text {
+  min-width: 50px;
+  display: inline-block;
+  color: $text-color;
+  cursor: pointer;
+
+  .icon-wrapper {
+    display: block;
+    position: relative;
+    float: right;
+    font-size: 0.9em;    
+  }
+}
