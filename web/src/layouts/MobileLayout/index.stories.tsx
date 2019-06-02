@@ -21,6 +21,11 @@ storiesOf('Layout/MobileLayout', module)
       {<DContent />}
     </MobileLayout>
   ))
+  .add('hide footer', () => (
+    <MobileLayout header={<DHeader />} footer={<DFooter />} showFooter={false}>
+      {<DContent />}
+    </MobileLayout>
+  ))
   .add('default with scroll', () => {
     const contentArr = []
     for (var i = 0; i < 200; i++) {

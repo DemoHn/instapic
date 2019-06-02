@@ -1,0 +1,28 @@
+$footer-height: 40px;
+$frame-padding: 20px;
+
+$default-color: #999;
+$selected-color: black;
+
+div.footer-frame {
+  display: flex;
+  height: $footer-height;
+  width: 100%;
+  justify-content: space-between;  
+  align-items: center;
+  padding-left: $frame-padding;
+  padding-right: $frame-padding;
+
+  span.col {
+    display: inline-block;
+    color: $default-color;
+    cursor: pointer;
+    i {
+      font-size: 1.25em;
+    }
+
+    &[data-selected=true] {
+      color: $selected-color;
+    }
+  }
+}
