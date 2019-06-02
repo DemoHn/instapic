@@ -1,0 +1,21 @@
+$header-height: 50px;
+$border-color: #ccc;
+div.frame {
+  display: flex;
+
+  div.header {
+    position: fixed;
+    height: $header-height;
+    border-bottom: 1px solid $border-color;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 100;
+    background-color: white;
+  }
+
+  div.content {
+    padding-top: $header-height;
+    z-index: 0;
+  }
+}
