@@ -1,7 +1,8 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
-
+import HomeFooter from '../../components/HomeFooter'
 import MobileLayout from './index'
+import HomeHeader from '../../components/HomeHeader'
 
 const DHeader: React.FC = () => {
   return <p>This is Header</p>
@@ -33,6 +34,22 @@ storiesOf('Layout/MobileLayout', module)
     }
     return (
       <MobileLayout header={<DHeader />} footer={<DFooter />}>
+        {contentArr}
+      </MobileLayout>
+    )
+  })
+  .add('scroll with actual home footer & header', () => {
+    const contentArr = []
+    for (var i = 0; i < 200; i++) {
+      contentArr.push(<DContent index={i} />)
+    }
+    return (
+      <MobileLayout
+        header={
+          <HomeHeader isMobile={true} userInfo={{ isLogin: true, userName: 'Elton' }} />
+        }
+        footer={<HomeFooter />}
+      >
         {contentArr}
       </MobileLayout>
     )

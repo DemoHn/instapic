@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react'
+import './index.scss'
 
 export interface DesktopLayoutProps {
   header: ReactNode
