@@ -1,0 +1,27 @@
+$header-height: 50px;
+div.nav-header-frame {
+  height: $header-height;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  div.col {
+    flex: 1;
+    display: flex;    
+    justify-content: center;
+
+    &:first-child > span {
+      margin-right: auto;
+    }
+
+    &:last-child > span {
+      margin-left: auto;
+    }
+    
+    &.left-col {
+      cursor: pointer;
+      font-size: 1.1em;
+    }
+  }
+}

@@ -1,7 +1,8 @@
-import React, { useCallback, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 
 export interface ImageDisplayProps {
   source: string
+  size: number
   backgroundColor?: string
 }
 
@@ -35,21 +36,14 @@ const calculateImageSize = (size: number, target?: HTMLImageElement): ImageSize 
 }
 
 const ImageDisplay: React.FC<ImageDisplayProps> = props => {
-  const { source, backgroundColor } = props
+  const { source, backgroundColor, size } = props
 
-  const [size, setSize] = useState(0)
   // control load image
   const [loadImage, setLoadImage] = useState(false)
   // image elem
   const [imageRef, setImageRef] = useState<HTMLImageElement>()
   // image size
   const [imageSize, setImageSize] = useState<ImageSize>({ width: 0, height: 0 })
-
-  const frameRef = useCallback((node: HTMLDivElement) => {
-    if (node !== null) {
-      setSize(node.getBoundingClientRect().width)
-    }
-  }, [])
 
   // load image after wrapper size is calculated
   useEffect(() => {
@@ -60,10 +54,10 @@ const ImageDisplay: React.FC<ImageDisplayProps> = props => {
   // define styles
   const styles = {
     wrapper: {
-      width: '100%',
+      width: size + 'px',
       height: size + 'px',
       backgroundColor: backgroundColor || 'rgba(220, 220, 220, 0.5)',
-      display: 'relative',
+      position: 'relative' as 'relative',
     },
     image: {
       position: 'absolute' as 'absolute',
@@ -75,7 +69,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = props => {
     },
   }
   return (
-    <div ref={frameRef} style={styles.wrapper}>
+    <div style={styles.wrapper}>
       {loadImage ? (
         <img
           src={source}
