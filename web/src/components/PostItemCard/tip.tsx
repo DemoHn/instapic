@@ -8,7 +8,7 @@ export interface TipProps {
 
 const TipFrame = styled.span`
   display: inline-block;
-  background-color: rgba(10, 10, 10, 0.75);
+  background-color: rgba(10, 10, 10, 0.6);
   height: 20px;
   color: rgb(240, 240, 240);
   border-radius: 10px;

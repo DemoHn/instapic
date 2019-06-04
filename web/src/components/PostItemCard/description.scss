@@ -1,0 +1,27 @@
+div.desc-frame {
+  div.desc-block {
+    line-height: 1.1em;
+    font-size: 1.1em;
+    margin-top: 1.2em;
+    margin-bottom: 0.6em;
+  }
+
+  div.user-block {
+    display: flex;
+    margin-top: 0.4em;
+    align-items: center;
+    justify-content: space-between;    
+
+    span.post-time {
+      span.label {
+        color: #aaa;
+      }
+    }
+
+    span.user-name {
+      span.label {
+        font-weight: bold;
+      }
+    }
+  }
+}

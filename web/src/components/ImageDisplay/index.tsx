@@ -56,7 +56,7 @@ const ImageDisplay: React.FC<ImageDisplayProps> = props => {
     wrapper: {
       width: size + 'px',
       height: size + 'px',
-      backgroundColor: backgroundColor || 'rgba(220, 220, 220, 0.5)',
+      backgroundColor: backgroundColor || 'transparent',
       position: 'relative' as 'relative',
     },
     image: {

@@ -9,8 +9,8 @@ const expImage2 = 'https://i.ytimg.com/vi/4nwq-xZnwJ4/hqdefault.jpg'
 
 const expLandscapeImage =
   'https://www.pngkit.com/png/detail/34-343596_hong-kong-mtr-logo.png'
-storiesOf('PostItemCard/Slider', module)
-  .add('default', () => <Slider sources={[expImage]} />)
+storiesOf('PostItemCard-Slider', module)
+  .add('default', () => <Slider sources={[expImage]} index={0} />)
   .add('with 250px box', () => {
     const boxStyle = {
       width: '250px',
@@ -18,7 +18,7 @@ storiesOf('PostItemCard/Slider', module)
 
     return (
       <div style={boxStyle}>
-        <Slider sources={[expImage, expImage2]} />
+        <Slider sources={[expImage, expImage2]} index={1} />
       </div>
     )
   })
@@ -30,7 +30,7 @@ storiesOf('PostItemCard/Slider', module)
 
     return (
       <div style={boxStyle}>
-        <Slider sources={[expImage, expLandscapeImage, expImage2]} />
+        <Slider sources={[expImage, expLandscapeImage, expImage2]} index={1} />
       </div>
     )
   })
