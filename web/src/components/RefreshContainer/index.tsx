@@ -1,24 +1,30 @@
 // based on: https://github.com/echoulen/react-pull-to-refresh
 import * as React from 'react'
-import { DIRECTION, isTreeScrollable } from './isScrollable'
 import DefaultPulldown from './pulldown'
 import DefaultRelease from './realease'
 import DefaultRefresh from './refresh'
+import DefaultBottomEnd from './bottomEnd'
 
 export interface RefreshContainerProps {
   pullDownContent?: JSX.Element
   releaseContent?: JSX.Element
   refreshContent?: JSX.Element
+  bottomEndContent?: JSX.Element
   pullDownThreshold: number
-  onRefresh: () => Promise<any>
-  triggerHeight?: number | 'auto'
+  bottomRefreshThreshold: number
+  onTopRefresh: () => Promise<any>
+  onBottomRefresh: () => Promise<any>
+  triggerHeight: number
   startInvisible?: boolean
   backgroundColor?: string
 }
 
 export interface RefreshContainerState {
   refreshContainerThresholdBreached: boolean
+  bottomThresholdBreached: boolean
+  bottomEnd: boolean
   maxPullDownDistance: number
+  maxBottomDistance: number
   onRefreshing: boolean
 }
 
@@ -33,6 +39,7 @@ export class RefreshContainer extends React.Component<
   }
 
   private pullDown: any
+  private bottomRefresh: any
 
   private pullDownRef(pullDown: any) {
     this.pullDown = pullDown
@@ -45,6 +52,17 @@ export class RefreshContainer extends React.Component<
     this.setState({ maxPullDownDistance })
   }
 
+  private bottomRefreshRef(bottomRefresh: any) {
+    this.bottomRefresh = bottomRefresh
+    const maxBottomDistance =
+      this.bottomRefresh &&
+      this.bottomRefresh.firstChild &&
+      this.bottomRefresh.firstChild['getBoundingClientRect']
+        ? this.bottomRefresh.firstChild['getBoundingClientRect']().height
+        : 0
+    this.setState({ maxBottomDistance })
+  }
+
   private dragging = false
   private startY = 0
   private currentY = 0
@@ -54,15 +72,20 @@ export class RefreshContainer extends React.Component<
 
     this.state = {
       refreshContainerThresholdBreached: false,
+      bottomThresholdBreached: false,
+      bottomEnd: false,
       maxPullDownDistance: 0,
+      maxBottomDistance: 0,
       onRefreshing: false,
     }
 
     this.containerRef = this.containerRef.bind(this)
     this.pullDownRef = this.pullDownRef.bind(this)
+    this.bottomRefreshRef = this.bottomRefreshRef.bind(this)
     this.onTouchStart = this.onTouchStart.bind(this)
     this.onTouchMove = this.onTouchMove.bind(this)
     this.onEnd = this.onEnd.bind(this)
+    this.onScroll = this.onScroll.bind(this)
   }
 
   public componentDidMount(): void {
@@ -76,6 +99,7 @@ export class RefreshContainer extends React.Component<
     this.container.addEventListener('mousedown', this.onTouchStart)
     this.container.addEventListener('mousemove', this.onTouchMove)
     this.container.addEventListener('mouseup', this.onEnd)
+    window.addEventListener('scroll', this.onScroll)
   }
 
   public componentWillUnmount(): void {
@@ -89,6 +113,7 @@ export class RefreshContainer extends React.Component<
     this.container.removeEventListener('mousedown', this.onTouchStart)
     this.container.removeEventListener('mousemove', this.onTouchMove)
     this.container.removeEventListener('mouseup', this.onEnd)
+    window.removeEventListener('scroll', this.onScroll)
   }
 
   private onTouchStart(e: any) {
@@ -96,31 +121,13 @@ export class RefreshContainer extends React.Component<
     this.startY = e['pageY'] || e.touches[0].pageY
     this.currentY = this.startY
 
-    if (triggerHeight === 'auto') {
-      const target = e.target
+    const top =
+      this.container.getBoundingClientRect().top ||
+      this.container.getBoundingClientRect().y ||
+      0
 
-      const container = this.container
-      if (!container) {
-        return
-      }
-
-      // an element we're touching can be scrolled up, so gesture is going to be a scroll gesture
-      if (e.type === 'touchstart' && isTreeScrollable(target, DIRECTION.up)) {
-        return
-      }
-
-      // even though we're not scrolling, the pull-to-refresh isn't visible to the user so cancel
-      if (container.getBoundingClientRect().top < 0) {
-        return
-      }
-    } else {
-      const top =
-        this.container.getBoundingClientRect().top ||
-        this.container.getBoundingClientRect().y ||
-        0
-      if (this.startY - top > triggerHeight) {
-        return
-      }
+    if (this.startY - top > triggerHeight) {
+      return
     }
 
     this.dragging = true
@@ -173,11 +180,12 @@ export class RefreshContainer extends React.Component<
         onRefreshing: true,
       },
       () => {
-        this.props.onRefresh().then(() => {
+        this.props.onTopRefresh().then(() => {
           this.initContainer()
           setTimeout(() => {
             this.setState({
               onRefreshing: false,
+              bottomEnd: false,
               refreshContainerThresholdBreached: false,
             })
           }, 200)
@@ -186,6 +194,47 @@ export class RefreshContainer extends React.Component<
     )
   }
 
+  private onScroll() {
+    const { bottomRefreshThreshold } = this.props
+
+    // get outer height
+    const containerHeight = this.container.clientHeight
+    const windowHeight = window.innerHeight
+    const scrollHeight = window.scrollY
+
+    // even trigger the breach line
+    if (windowHeight + scrollHeight - containerHeight > bottomRefreshThreshold) {
+      this.setState({
+        bottomThresholdBreached: true,
+      })
+    }
+    if (windowHeight + scrollHeight <= containerHeight) {
+      this.setState({
+        bottomThresholdBreached: false,
+      })
+    }
+
+    const { bottomThresholdBreached, bottomEnd } = this.state
+    // do nothing when bottomEnd is shown
+    if (bottomThresholdBreached && !bottomEnd) {
+      this.bottomRefresh.style.visibility = 'visible'
+      // call function
+      this.props.onBottomRefresh().then(hasMore => {
+        this.initContainer()
+        setTimeout(() => {
+          this.setState({
+            bottomThresholdBreached: false,
+            bottomEnd: !hasMore,
+          })
+          if (hasMore) {
+            this.bottomRefresh.style.visibility = 'hidden'
+          }
+        }, 200)
+      })
+    } else if (!bottomEnd) {
+      this.bottomRefresh.style.visibility = 'hidden'
+    }
+  }
   private initContainer() {
     requestAnimationFrame(() => {
       if (this.container) {
@@ -219,6 +268,21 @@ export class RefreshContainer extends React.Component<
     )
   }
 
+  private renderBottomRefreshContent() {
+    const { refreshContent, bottomEndContent } = this.props
+    const { bottomEnd } = this.state
+    const bottomRefStyle: React.CSSProperties = {
+      visibility: 'hidden',
+    }
+    return (
+      <div id="ptr-bottom-refresh" ref={this.bottomRefreshRef} style={bottomRefStyle}>
+        {bottomEnd
+          ? bottomEndContent || <DefaultBottomEnd />
+          : refreshContent || <DefaultRefresh />}
+      </div>
+    )
+  }
+
   public render() {
     const { backgroundColor } = this.props
     const containerStyle: React.CSSProperties = {
@@ -238,6 +302,7 @@ export class RefreshContainer extends React.Component<
         <div id="ptr-container" ref={this.containerRef} style={containerStyle}>
           {this.props.children}
         </div>
+        {this.renderBottomRefreshContent()}
       </div>
     )
   }
