@@ -3,21 +3,21 @@ import { storiesOf } from '@storybook/react'
 import { BrowserRouter as Router } from 'react-router-dom'
 
 import PostButton from '../PostButton'
-import NavHeader from './index'
-storiesOf('NavHeader', module)
+import MobileNavHeader from './index'
+storiesOf('MobileNavHeader', module)
   .add('default (only left)', () => (
     <Router>
-      <NavHeader leftLink="/" />
+      <MobileNavHeader leftLink="/" />
     </Router>
   ))
   .add('with middle component', () => (
     <Router>
-      <NavHeader middleComponent={<span>Hey Man's Post</span>} leftLink="/" />
+      <MobileNavHeader middleComponent={<span>Hey Man's Post</span>} leftLink="/" />
     </Router>
   ))
   .add('with submit button', () => (
     <Router>
-      <NavHeader
+      <MobileNavHeader
         leftLink="/"
         middleComponent={<span>Hey Man's Post</span>}
         rightComponent={<PostButton text="submit" />}

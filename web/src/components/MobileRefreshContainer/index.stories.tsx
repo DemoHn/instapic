@@ -1,6 +1,6 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
-import RefreshContainer from './index'
+import MobileRefreshContainer from './index'
 import DefaultPulldown from './pulldown'
 import DefaultRelease from './realease'
 import DefaultRefresh from './refresh'
@@ -13,14 +13,14 @@ const onRefresh = () => {
     }, 1000)
   })
 }
-storiesOf('RefreshContainer', module)
+storiesOf('MobileRefreshContainer', module)
   .add('default pulldown', () => <DefaultPulldown />)
   .add('default release', () => <DefaultRelease />)
   .add('default refresh', () => <DefaultRefresh />)
   .add('load refresh container', () => {
     return (
       <div style={{ marginTop: '30px', position: 'relative' }}>
-        <RefreshContainer
+        <MobileRefreshContainer
           onTopRefresh={onRefresh}
           onBottomRefresh={onRefresh}
           triggerHeight={50}
@@ -33,7 +33,7 @@ storiesOf('RefreshContainer', module)
             .map(item => (
               <div>{'diu ' + item}</div>
             ))}
-        </RefreshContainer>
+        </MobileRefreshContainer>
       </div>
     )
   })
