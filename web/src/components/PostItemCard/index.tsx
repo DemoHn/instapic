@@ -14,9 +14,9 @@ export interface PostItemCardProps {
 }
 
 const CardFrame = styled.div`
-  -webkit-box-shadow: 1px 1px 4px -1px rgba(0, 0, 0, 0.25);
-  -moz-box-shadow: 1px 1px 4px -1px rgba(0, 0, 0, 0.25);
-  box-shadow: 1px 1px 4px -1px rgba(0, 0, 0, 0.25);
+  -webkit-box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.5);
   padding: 8px 16px;
 `
 const PostItemCard: React.FC<PostItemCardProps> = props => {

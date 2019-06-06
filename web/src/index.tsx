@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import './index.css'
 // import global theme files
 import 'semantic-ui-css/semantic.min.css'
+import 'react-semantic-toasts/styles/react-semantic-alert.css'
 
 import App from './App'
 import * as serviceWorker from './serviceWorker'

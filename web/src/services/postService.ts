@@ -19,12 +19,12 @@ export interface PostsResponse {
   has_more: boolean
   posts: PostResponse[]
 }
-export function getPosts(limit?: number, from?: number): Promise<PostsResponse> {
+export function getPosts(limit?: number, cursor?: number): Promise<PostsResponse> {
   return axios
     .get('/api/v1.0/posts', {
       params: {
         limit,
-        from,
+        cursor,
       },
     })
     .then(resp => resp.data as PostsResponse)

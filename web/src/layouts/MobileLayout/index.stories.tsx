@@ -2,7 +2,7 @@ import React from 'react'
 import { storiesOf } from '@storybook/react'
 import HomeFooter from '../../components/HomeFooter'
 import MobileLayout from './index'
-import HomeHeader from '../../components/HomeHeader'
+import MobileHomeHeader from '../../components/MobileHomeHeader'
 
 const DHeader: React.FC = () => {
   return <p>This is Header</p>
@@ -44,12 +44,7 @@ storiesOf('Layout/MobileLayout', module)
       contentArr.push(<DContent index={i} />)
     }
     return (
-      <MobileLayout
-        header={
-          <HomeHeader isMobile={true} userInfo={{ isLogin: true, userName: 'Elton' }} />
-        }
-        footer={<HomeFooter />}
-      >
+      <MobileLayout header={<MobileHomeHeader />} footer={<HomeFooter />}>
         {contentArr}
       </MobileLayout>
     )

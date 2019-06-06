@@ -1,3 +1,5 @@
+// HomeHeader is used in both mobile & desktop version
+// only shown in home page (since mobile page will be different)
 import React from 'react'
 import styled from 'styled-components'
 // Since typescript do not support 'import' assets at all-=-

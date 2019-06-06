@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Input, Button } from 'semantic-ui-react'
 
@@ -34,17 +34,28 @@ const ButtonColumnWrapper = styled.div`
   margin-top: 15px;
 `
 export interface RegisterFormProps {
-  onLoginSubmit: Function
-  onRegisterSubmit: Function
+  onLoginSubmit: (name: string, password: string) => any
+  onRegisterSubmit: (name: string, password: string) => any
 }
+
 const RegisterForm: React.FC<RegisterFormProps> = props => {
   const { onLoginSubmit, onRegisterSubmit } = props
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   return (
     <FormWrapper>
       <Banner>Welcome to InstaPic!</Banner>
       <SubHeader>InstaPic is a place to create / share / enjoy.</SubHeader>
       <InputWrapper>
-        <Input icon="user" iconPosition="left" placeholder="username" fluid />
+        <Input
+          icon="user"
+          iconPosition="left"
+          placeholder="username"
+          fluid
+          onChange={e => {
+            setUsername(e.target.value)
+          }}
+        />
       </InputWrapper>
       <InputWrapper>
         <Input
@@ -53,6 +64,9 @@ const RegisterForm: React.FC<RegisterFormProps> = props => {
           placeholder="password"
           type="password"
           fluid
+          onChange={e => {
+            setPassword(e.target.value)
+          }}
         />
       </InputWrapper>
 
@@ -60,7 +74,7 @@ const RegisterForm: React.FC<RegisterFormProps> = props => {
         <Button.Group>
           <Button
             onClick={() => {
-              onRegisterSubmit()
+              onRegisterSubmit(username, password)
             }}
           >
             Sign Up
@@ -69,7 +83,7 @@ const RegisterForm: React.FC<RegisterFormProps> = props => {
           <Button
             positive
             onClick={() => {
-              onLoginSubmit()
+              onLoginSubmit(username, password)
             }}
           >
             Sign In

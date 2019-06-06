@@ -12,11 +12,18 @@ const Frame = styled.div`
   padding-left: 30px;
   padding-right: 30px;
 `
-const DesktopHomeHeader: React.FC<UserDropdownProps> = props => {
+
+export interface DesktopHomeHeaderProps {
+  user: UserDropdownProps
+  hideUserBar: boolean
+}
+
+const DesktopHomeHeader: React.FC<DesktopHomeHeaderProps> = props => {
+  const { user, hideUserBar } = props
   return (
     <Frame>
       <img src={logo} alt="logo" height={36} />
-      <UserDropdown {...props} />
+      {!hideUserBar ? <UserDropdown {...user} /> : null}
     </Frame>
   )
 }

@@ -10,7 +10,7 @@ parameters:
     required: true    
     schema:
       type: object
-      id: User
+      id: UserRequest
       required:
         - name
         - password
