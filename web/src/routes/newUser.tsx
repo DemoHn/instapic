@@ -65,7 +65,7 @@ const useUserActions = (toastManager: any) => {
   )
 
   const onRegisterSubmit = useCallback(
-    async (name: string, password) => {
+    async (name: string, password: string) => {
       // ensure not duplicate submit
       if (!handled) {
         const { isSuccess, error } = await userRegister({ name, password })
@@ -78,6 +78,10 @@ const useUserActions = (toastManager: any) => {
             {
               appearance: 'info',
               autoDismiss: true,
+            },
+            () => {
+              // callback
+              setHandled(false)
             }
           )
         }

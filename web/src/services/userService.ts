@@ -31,7 +31,10 @@ export function logout(): Promise<any> {
     .get('/api/v1.0/user/logout', {
       headers: getAuthHeader(),
     })
-    .then(resp => resp.data)
+    .then(resp => {
+      removeToken()
+      return resp.data
+    })
 }
 
 // localstorage to store sessions
@@ -41,7 +44,7 @@ function storeToken(token: string) {
   window.localStorage.setItem(SESSION_KEY, token)
 }
 
-function removeToken(token: string) {
+function removeToken() {
   window.localStorage.removeItem(SESSION_KEY)
 }
 
