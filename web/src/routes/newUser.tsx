@@ -42,7 +42,7 @@ const useUserActions = (toastManager: any) => {
   const onLoginSubmit = useCallback(
     async (name: string, password: string) => {
       if (!handled) {
-        const { isSuccess, error } = await userLogin({ name, password })
+        const { isSuccess } = await userLogin({ name, password })
         setHandled(true)
         if (isSuccess) {
           toastManager.add(
@@ -68,7 +68,7 @@ const useUserActions = (toastManager: any) => {
     async (name: string, password: string) => {
       // ensure not duplicate submit
       if (!handled) {
-        const { isSuccess, error } = await userRegister({ name, password })
+        const { isSuccess } = await userRegister({ name, password })
         if (isSuccess) {
           toastManager.add(
             {

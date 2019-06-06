@@ -6,6 +6,8 @@ from core.errors import (
   UserNotFoundException,
   WrongPasswordException
 )
+
+from core.services.post_service import transform_username
 from flask import current_app as app
 from pbkdf2 import crypt
 import time
@@ -13,8 +15,6 @@ import os
 import base58
 import random
 import hashlib
-
-
 
 def register_user(name, password):
   password_hash = generate_hash(password)
@@ -71,6 +71,14 @@ def login_user(name, password):
     db.session.commit()
   
   return token
+
+def get_user(user_id):
+  user = db.session.query(User).filter_by(id=user_id).first()
+  return {
+    'id': user.id,
+    'name': user.name,
+    'userword': '%s-%d' % (transform_username(user.name), user.id)
+  }
 
 def remove_token(user_id):
   db.session.query(UserSession).filter_by(user_id=user_id).delete()

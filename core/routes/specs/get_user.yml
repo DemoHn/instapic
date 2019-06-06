@@ -1,0 +1,29 @@
+List posts of one user.
+---
+tags:
+  - users
+consumes:
+  - application/json
+responses:
+  200:
+    description: get the information of user
+    schema:
+      $ref: '#/definitions/User'
+definitions:
+  User:
+    type: object
+    required:
+      - name
+    properties:
+      id:
+        type: integer
+        description: user id
+        example: 250
+      name:
+        type: string
+        description: user name
+        example: brannn
+      userword:
+        type: string
+        description: a special combination of user id and name to avoid iterate users bruptly.
+        example: Hong_Kong_Journalist-120

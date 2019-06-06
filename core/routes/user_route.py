@@ -3,7 +3,8 @@ from flask import jsonify, request, g
 from core.services.user_service import (
   register_user,
   login_user,
-  remove_token
+  remove_token,
+  get_user
 )
 from core.middlewares import auth
 
@@ -36,3 +37,10 @@ def logout():
   if user_id:
     remove_token(user_id)
   return jsonify()
+
+@api.route('/users', methods=['GET'])
+@auth
+@swag_from('sepec/get_user.yml', validation=False)
+def get_user_ctrl():
+  user_id = g.user_id
+  return jsonify(get_user(user_id))
