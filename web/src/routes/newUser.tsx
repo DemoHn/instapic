@@ -6,8 +6,7 @@ import { isMobile } from 'react-device-detect'
 import DesktopLayout from '../layouts/DesktopLayout'
 import MobileLayout from '../layouts/MobileLayout'
 // components
-import HomeFooter from '../components/HomeFooter'
-import MobileHomeHeader from '../components/MobileHomeHeader'
+import MobileNavHeader from '../components/MobileNavHeader'
 import DesktopHomeHeader from '../components/DesktopHomeHeader'
 import RegisterForm from '../components/RegisterForm'
 import ToastMessage from '../components/ToastMessage'
@@ -34,6 +33,10 @@ const FormWrapper = styled.div`
   -webkit-box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.5);
   box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.5);
+`
+
+const MobileContainerFrame = styled.div`
+  margin-top: 90px;
 `
 // submit handlers
 const useUserActions = (toastManager: any) => {
@@ -94,11 +97,20 @@ const useUserActions = (toastManager: any) => {
   return [onLoginSubmit, onRegisterSubmit]
 }
 
-const renderMobileUserPage = withToastManager(
-  <MobileLayout header={<MobileHomeHeader />} footer={<HomeFooter />}>
-    {'x'}
-  </MobileLayout>
-)
+const renderMobileUserPage = withToastManager((props: ToastManagerProps) => {
+  const [onLoginSubmit, onRegisterSubmit] = useUserActions(props.toastManager)
+  return (
+    <MobileLayout
+      header={<MobileNavHeader leftLink="/" />}
+      footer={null}
+      showFooter={false}
+    >
+      <MobileContainerFrame>
+        <RegisterForm onLoginSubmit={onLoginSubmit} onRegisterSubmit={onRegisterSubmit} />
+      </MobileContainerFrame>
+    </MobileLayout>
+  )
+})
 
 const renderDesktopUserPage = withToastManager((props: ToastManagerProps) => {
   const [onLoginSubmit, onRegisterSubmit] = useUserActions(props.toastManager)

@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { Response } from './types'
+import _ from 'lodash'
 
 export interface UserRequest {
   name: string
@@ -10,6 +11,11 @@ export interface TokenResponse {
   token: string
 }
 
+export interface UserResponse {
+  id: number
+  name: string
+  userword: string
+}
 export function userLogin(req: UserRequest): Promise<Response<TokenResponse>> {
   return axios.post('/api/v1.0/users/login', req).then(resp => {
     const respData = resp.data as TokenResponse
@@ -37,6 +43,17 @@ export function logout(): Promise<any> {
     })
 }
 
+export function getUser(): Promise<Response<UserResponse>> {
+  return axios
+    .get('/api/v1.0/users', {
+      headers: getAuthHeader(),
+    })
+    .then(resp => ({
+      isSuccess: true,
+      data: resp.data,
+    }))
+}
+
 // localstorage to store sessions
 const SESSION_KEY = 'instapic_session_key'
 
@@ -44,11 +61,16 @@ function storeToken(token: string) {
   window.localStorage.setItem(SESSION_KEY, token)
 }
 
-function removeToken() {
+export function removeToken() {
   window.localStorage.removeItem(SESSION_KEY)
 }
 
-export function getAuthHeader() {
+function getAuthHeader() {
   const token = window.localStorage.getItem(SESSION_KEY)
   return { Authorization: `Bearer ${token || ''}` }
+}
+
+export function hasToken() {
+  console.log(window.localStorage.getItem(SESSION_KEY))
+  return !_.isNil(window.localStorage.getItem(SESSION_KEY))
 }

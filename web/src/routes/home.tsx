@@ -14,14 +14,7 @@ import MobileRefreshContainer from '../components/MobileRefreshContainer'
 
 // services
 import { getPosts, PostResponse } from '../services/postService'
-
-const getDesktopHomeHeader = () => {
-  const userInfo = {
-    isLogin: true,
-    userName: 'Hello World',
-  }
-  return <DesktopHomeHeader hideUserBar={false} user={userInfo} />
-}
+import { getUser, hasToken, UserResponse } from '../services/userService'
 
 const CardWrapper = styled.div`
   margin-top: 15px;
@@ -86,12 +79,39 @@ const usePostsModel = (
   return [posts, onTopRefresh, onBottomRefresh]
 }
 
+const useUserModel = (isMobile: boolean) => {
+  const [userInfo, setUserInfo] = useState({
+    isLogin: false,
+    userName: '',
+  })
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const { isSuccess, data } = await getUser()
+      if (isSuccess) {
+        const respData = data as UserResponse
+        setUserInfo({
+          isLogin: true,
+          userName: respData.name,
+        })
+      }
+    }
+
+    if (hasToken() && !isMobile) {
+      fetchUserData()
+    }
+  }, [isMobile])
+
+  return userInfo
+}
+
 const Home: React.FC = () => {
   const [posts, onTopRefresh, onBottomRefresh] = usePostsModel(isMobile)
+  const userInfo = useUserModel(isMobile)
   return (
     <>
       <BrowserView>
-        <DesktopLayout header={getDesktopHomeHeader()}>
+        <DesktopLayout header={<DesktopHomeHeader hideUserBar={false} user={userInfo} />}>
           <DesktopCardContainer>
             {posts.map(post => {
               return (
