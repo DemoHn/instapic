@@ -9,8 +9,9 @@ import MobileLayout from '../layouts/MobileLayout'
 import HomeFooter from '../components/HomeFooter'
 import MobileHomeHeader from '../components/MobileHomeHeader'
 import DesktopHomeHeader from '../components/DesktopHomeHeader'
-import PostItemCard from '../components/PostItemCard'
 import MobileRefreshContainer from '../components/MobileRefreshContainer'
+import DesktopPostsContainer from '../components/DesktopPostsContainer'
+import PostItemCard from '../components/PostItemCard'
 
 // services
 import { getPosts, PostResponse } from '../services/postService'
@@ -23,17 +24,6 @@ const CardWrapper = styled.div`
   padding-right: 5px;
 `
 
-const DesktopCardContainer = styled.div`
-  display: flex;
-  max-width: 1024px;
-  margin-left: auto;
-  margin-right: auto;
-  justify-content: space-between;
-  flex-flow: column wrap;
-  flex-wrap: wrap;
-  flex-direction: row;
-`
-
 const DesktopCardWrapper = styled.div`
   width: 32.5%;
   margin-top: 10px;
@@ -44,9 +34,8 @@ const DesktopCardWrapper = styled.div`
 
 const usePostsModel = (
   isMobile: boolean
-): [PostResponse[], () => Promise<any>, () => Promise<boolean>] => {
+): [PostResponse[], () => Promise<any>, () => Promise<any>] => {
   const PAGE_LIMIT = isMobile ? 4 : 12
-
   const [posts, setPosts] = useState<PostResponse[]>([])
   const [cursor, setCursor] = useState()
 
@@ -65,15 +54,18 @@ const usePostsModel = (
     setPosts(newPostsInfo.posts)
     setCursor(newPostsInfo.cursor)
 
-    return true
+    return [true, newPostsInfo.posts]
   }, [PAGE_LIMIT])
 
   const onBottomRefresh = useCallback(async () => {
     const postInfo = await getPosts(PAGE_LIMIT, cursor)
     const hasMore = postInfo.has_more
-    setPosts(posts.concat(postInfo.posts))
+
+    const newPosts = posts.concat(postInfo.posts)
+    setPosts(newPosts)
     setCursor(postInfo.cursor)
-    return hasMore
+
+    return [hasMore, newPosts]
   }, [PAGE_LIMIT, cursor, posts])
 
   return [posts, onTopRefresh, onBottomRefresh]
@@ -108,27 +100,21 @@ const useUserModel = (isMobile: boolean) => {
 const Home: React.FC = () => {
   const [posts, onTopRefresh, onBottomRefresh] = usePostsModel(isMobile)
   const userInfo = useUserModel(isMobile)
+
   return (
     <>
       <BrowserView>
         <DesktopLayout header={<DesktopHomeHeader hideUserBar={false} user={userInfo} />}>
-          <DesktopCardContainer>
-            {posts.map(post => {
-              return (
-                <DesktopCardWrapper>
-                  <PostItemCard
-                    postTimestamp={post.created_at}
-                    images={post.image_urls}
-                    description={post.description}
-                    user={{
-                      name: post.user.name,
-                      link: `/users/${post.user.userword}`,
-                    }}
-                  />
-                </DesktopCardWrapper>
-              )
-            })}
-          </DesktopCardContainer>
+          <DesktopPostsContainer
+            onInit={async () => {
+              const [hasMore, updatedPosts] = await onBottomRefresh()
+              return [hasMore, updatedPosts]
+            }}
+            onUpdate={async () => {
+              const [hasMore, updatedPosts] = await onBottomRefresh()
+              return [hasMore, updatedPosts]
+            }}
+          />
         </DesktopLayout>
       </BrowserView>
       <MobileView>
