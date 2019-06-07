@@ -1,6 +1,6 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
-import MobileRefreshContainer from './index'
+import MobileRefreshContainer from './refreshContainer'
 import DefaultPulldown from './pulldown'
 import DefaultRelease from './realease'
 import DefaultRefresh from './refresh'
@@ -13,7 +13,7 @@ const onRefresh = () => {
     }, 1000)
   })
 }
-storiesOf('MobileRefreshContainer', module)
+storiesOf('MobilePostsContainer', module)
   .add('default pulldown', () => <DefaultPulldown />)
   .add('default release', () => <DefaultRelease />)
   .add('default refresh', () => <DefaultRefresh />)

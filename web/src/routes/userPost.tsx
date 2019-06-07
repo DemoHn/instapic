@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import styled from 'styled-components'
 import { isMobile } from 'react-device-detect'
 
 // components
 import MobileNavHeader from '../components/MobileNavHeader'
 import HomeFooter from '../components/HomeFooter'
-import PostItemCard from '../components/PostItemCard'
-import MobileRefreshContainer from '../components/MobileRefreshContainer'
 import DesktopHomeHeader from '../components/DesktopHomeHeader'
+import MobilePostsContainer from '../components/MobilePostsContainer'
+import DesktopPostsContainer from '../components/DesktopPostsContainer'
+
 // layouts
 import MobileLayout from '../layouts/MobileLayout'
 import DesktopLayout from '../layouts/DesktopLayout'
@@ -18,7 +18,7 @@ import { getUser, hasToken, UserResponse } from '../services/userService'
 const usePostsModel = (
   isMobile: boolean,
   userword: string
-): [PostResponse[], () => Promise<any>, () => Promise<boolean>] => {
+): [() => Promise<any>, () => Promise<any>] => {
   const PAGE_LIMIT = isMobile ? 4 : 12
 
   const [posts, setPosts] = useState<PostResponse[]>([])
@@ -36,21 +36,22 @@ const usePostsModel = (
 
   const onTopRefresh = useCallback(async () => {
     const { data: newPostsInfo } = await listUserPosts(userword, PAGE_LIMIT)
-    setPosts(newPostsInfo.posts)
+    const updatedPosts = newPostsInfo.posts
+    setPosts(updatedPosts)
     setCursor(newPostsInfo.cursor)
-
-    return true
+    return [true, updatedPosts]
   }, [PAGE_LIMIT, userword])
 
   const onBottomRefresh = useCallback(async () => {
     const { data: postInfo } = await listUserPosts(userword, PAGE_LIMIT, cursor)
     const hasMore = postInfo.has_more
-    setPosts(posts.concat(postInfo.posts))
+    const updatedPosts = posts.concat(postInfo.posts)
+    setPosts(updatedPosts)
     setCursor(postInfo.cursor)
-    return hasMore
+    return [hasMore, updatedPosts]
   }, [PAGE_LIMIT, cursor, posts, userword])
 
-  return [posts, onTopRefresh, onBottomRefresh]
+  return [onTopRefresh, onBottomRefresh]
 }
 
 const useUserModel = (isMobile: boolean) => {
@@ -79,35 +80,9 @@ const useUserModel = (isMobile: boolean) => {
   return userInfo
 }
 
-const CardWrapper = styled.div`
-  margin-top: 15px;
-  margin-bottom: 15px;
-  padding-left: 5px;
-  padding-right: 5px;
-`
-
-const DesktopCardContainer = styled.div`
-  display: flex;
-  max-width: 1024px;
-  margin-left: auto;
-  margin-right: auto;
-  justify-content: space-between;
-  flex-flow: column wrap;
-  flex-wrap: wrap;
-  flex-direction: row;
-`
-
-const DesktopCardWrapper = styled.div`
-  width: 32.5%;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  padding-left: 5px;
-  padding-right: 5px;
-`
-
 const MobileUserPostPage: React.FC<{ userword: string }> = props => {
   const { userword } = props
-  const [posts, onTopRefresh, onBottomRefresh] = usePostsModel(isMobile, userword)
+  const [onTopRefresh, onBottomRefresh] = usePostsModel(isMobile, userword)
   const userInfo = useUserModel(false)
 
   const title = userInfo.isLogin ? `${userInfo.userName}'s Posts` : ''
@@ -116,59 +91,40 @@ const MobileUserPostPage: React.FC<{ userword: string }> = props => {
       header={<MobileNavHeader leftLink="/" middleComponent={<span>{title}</span>} />}
       footer={<HomeFooter />}
     >
-      {posts.length > 0 ? (
-        <MobileRefreshContainer
-          pullDownThreshold={80}
-          bottomRefreshThreshold={100}
-          triggerHeight={300}
-          backgroundColor="white"
-          onTopRefresh={onTopRefresh}
-          onBottomRefresh={onBottomRefresh}
-        >
-          {posts.map(post => {
-            return (
-              <CardWrapper>
-                <PostItemCard
-                  postTimestamp={post.created_at}
-                  images={post.image_urls}
-                  description={post.description}
-                  user={{
-                    name: post.user.name,
-                    link: `users/${post.user.userword}`,
-                  }}
-                />
-              </CardWrapper>
-            )
-          })}
-        </MobileRefreshContainer>
-      ) : null}
+      <MobilePostsContainer
+        onInit={async () => {
+          const [hasMore, updatedPosts] = await onBottomRefresh()
+          return [hasMore, updatedPosts]
+        }}
+        onTopUpdate={async () => {
+          const [hasMore, updatedPosts] = await onTopRefresh()
+          return [hasMore, updatedPosts]
+        }}
+        onBottomUpdate={async () => {
+          const [hasMore, updatedPosts] = await onBottomRefresh()
+          return [hasMore, updatedPosts]
+        }}
+      />
     </MobileLayout>
   )
 }
 
 const DesktopUserPostPage: React.FC<{ userword: string }> = props => {
   const { userword } = props
-  const [posts, , onBottomRefresh] = usePostsModel(false, userword)
+  const [, onBottomRefresh] = usePostsModel(false, userword)
   const userInfo = useUserModel(false)
   return (
     <DesktopLayout header={<DesktopHomeHeader hideUserBar={false} user={userInfo} />}>
-      <DesktopCardContainer>
-        {posts.map(post => {
-          return (
-            <DesktopCardWrapper>
-              <PostItemCard
-                postTimestamp={post.created_at}
-                images={post.image_urls}
-                description={post.description}
-                user={{
-                  name: post.user.name,
-                  link: `/users/${post.user.userword}`,
-                }}
-              />
-            </DesktopCardWrapper>
-          )
-        })}
-      </DesktopCardContainer>
+      <DesktopPostsContainer
+        onInit={async () => {
+          const [hasMore, updatedPosts] = await onBottomRefresh()
+          return [hasMore, updatedPosts]
+        }}
+        onUpdate={async () => {
+          const [hasMore, updatedPosts] = await onBottomRefresh()
+          return [hasMore, updatedPosts]
+        }}
+      />
     </DesktopLayout>
   )
 }

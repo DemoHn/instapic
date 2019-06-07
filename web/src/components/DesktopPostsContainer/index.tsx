@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import PostItemCard from '../PostItemCard'
 // services
 import { PostResponse } from '../../services/postService'
-import { async } from 'q'
 
 const loading = require('../../assets/loading.svg')
 
@@ -60,13 +59,13 @@ const TheEndIndicator: React.FC = () => {
 
   const TextWrapper = styled.div`
     text-align: center;
-    font-size: 14px;
+    font-size: 16px;
     color: #bbb;
   `
   return (
     <PulldownFrame>
       <TextWrapper>
-        <span>The End</span>
+        <span>-- The End --</span>
       </TextWrapper>
     </PulldownFrame>
   )

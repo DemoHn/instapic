@@ -12,14 +12,14 @@ const PulldownFrame = styled.div`
 
 const TextWrapper = styled.div`
   text-align: center;
-  font-size: 14px;
+  font-size: 16px;
   color: #bbb;
 `
 const DefaultBottomEnd: React.FC = () => {
   return (
     <PulldownFrame>
       <TextWrapper>
-        <span>nothing more</span>
+        <span>-- The End --</span>
       </TextWrapper>
     </PulldownFrame>
   )

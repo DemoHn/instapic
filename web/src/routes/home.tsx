@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { isMobile, BrowserView, MobileView } from 'react-device-detect'
-import styled from 'styled-components'
 
 // layouts
 import DesktopLayout from '../layouts/DesktopLayout'
@@ -9,32 +8,14 @@ import MobileLayout from '../layouts/MobileLayout'
 import HomeFooter from '../components/HomeFooter'
 import MobileHomeHeader from '../components/MobileHomeHeader'
 import DesktopHomeHeader from '../components/DesktopHomeHeader'
-import MobileRefreshContainer from '../components/MobileRefreshContainer'
+import MobilePostsContainer from '../components/MobilePostsContainer'
 import DesktopPostsContainer from '../components/DesktopPostsContainer'
-import PostItemCard from '../components/PostItemCard'
 
 // services
 import { getPosts, PostResponse } from '../services/postService'
 import { getUser, hasToken, UserResponse } from '../services/userService'
 
-const CardWrapper = styled.div`
-  margin-top: 15px;
-  margin-bottom: 15px;
-  padding-left: 5px;
-  padding-right: 5px;
-`
-
-const DesktopCardWrapper = styled.div`
-  width: 32.5%;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  padding-left: 5px;
-  padding-right: 5px;
-`
-
-const usePostsModel = (
-  isMobile: boolean
-): [PostResponse[], () => Promise<any>, () => Promise<any>] => {
+const usePostsModel = (isMobile: boolean): [() => Promise<any>, () => Promise<any>] => {
   const PAGE_LIMIT = isMobile ? 4 : 12
   const [posts, setPosts] = useState<PostResponse[]>([])
   const [cursor, setCursor] = useState()
@@ -68,7 +49,7 @@ const usePostsModel = (
     return [hasMore, newPosts]
   }, [PAGE_LIMIT, cursor, posts])
 
-  return [posts, onTopRefresh, onBottomRefresh]
+  return [onTopRefresh, onBottomRefresh]
 }
 
 const useUserModel = (isMobile: boolean) => {
@@ -98,7 +79,7 @@ const useUserModel = (isMobile: boolean) => {
 }
 
 const Home: React.FC = () => {
-  const [posts, onTopRefresh, onBottomRefresh] = usePostsModel(isMobile)
+  const [onTopRefresh, onBottomRefresh] = usePostsModel(isMobile)
   const userInfo = useUserModel(isMobile)
 
   return (
@@ -119,32 +100,20 @@ const Home: React.FC = () => {
       </BrowserView>
       <MobileView>
         <MobileLayout header={<MobileHomeHeader />} footer={<HomeFooter />}>
-          {posts.length > 0 ? (
-            <MobileRefreshContainer
-              pullDownThreshold={80}
-              bottomRefreshThreshold={100}
-              triggerHeight={300}
-              backgroundColor="white"
-              onTopRefresh={onTopRefresh}
-              onBottomRefresh={onBottomRefresh}
-            >
-              {posts.map(post => {
-                return (
-                  <CardWrapper>
-                    <PostItemCard
-                      postTimestamp={post.created_at}
-                      images={post.image_urls}
-                      description={post.description}
-                      user={{
-                        name: post.user.name,
-                        link: `users/${post.user.userword}`,
-                      }}
-                    />
-                  </CardWrapper>
-                )
-              })}
-            </MobileRefreshContainer>
-          ) : null}
+          <MobilePostsContainer
+            onInit={async () => {
+              const [hasMore, updatedPosts] = await onBottomRefresh()
+              return [hasMore, updatedPosts]
+            }}
+            onTopUpdate={async () => {
+              const [hasMore, updatedPosts] = await onTopRefresh()
+              return [hasMore, updatedPosts]
+            }}
+            onBottomUpdate={async () => {
+              const [hasMore, updatedPosts] = await onBottomRefresh()
+              return [hasMore, updatedPosts]
+            }}
+          />
         </MobileLayout>
       </MobileView>
     </>
