@@ -40,7 +40,7 @@ def logout():
 
 @api.route('/users', methods=['GET'])
 @auth
-@swag_from('sepec/get_user.yml', validation=False)
+@swag_from('specs/get_user.yml', validation=False)
 def get_user_ctrl():
   user_id = g.user_id
   return jsonify(get_user(user_id))

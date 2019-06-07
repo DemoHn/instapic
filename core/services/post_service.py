@@ -131,7 +131,7 @@ def validate_desc_length(description):
 def validate_userword(userword):
   results = re.findall(r'^(.+)-([0-9]+)$', userword)
   if len(results) == 0:
-    raise ValidationException('invalid userword: %s', userword, ['invalid-userword', userword])
+    raise ValidationException('invalid userword: %s' % userword, ['invalid-userword', userword])
   else:
     t_username, user_id = results[0]
     user_id = int(user_id)

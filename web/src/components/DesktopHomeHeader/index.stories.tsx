@@ -1,5 +1,7 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
+import { BrowserRouter as Router } from 'react-router-dom'
+
 import DesktopHomeHeader from './index'
 
 const userInfo = {
@@ -7,5 +9,7 @@ const userInfo = {
   isLogin: true,
 }
 storiesOf('DestktopHomeHeader', module).add('default (desktop)', () => (
-  <DesktopHomeHeader user={userInfo} hideUserBar={false} />
+  <Router>
+    <DesktopHomeHeader user={userInfo} hideUserBar={false} />
+  </Router>
 ))

@@ -1,5 +1,6 @@
 import axios from 'axios'
-
+import { Response } from './types'
+import { getAuthHeader } from './userService'
 export interface UserResponse {
   id: number
   name: string
@@ -28,4 +29,23 @@ export function getPosts(limit?: number, cursor?: number): Promise<PostsResponse
       },
     })
     .then(resp => resp.data as PostsResponse)
+}
+
+export function listUserPosts(
+  userword: string,
+  limit?: number,
+  cursor?: number
+): Promise<Response<PostsResponse>> {
+  return axios
+    .get(`/api/v1.0/posts/${userword}`, {
+      params: {
+        limit,
+        cursor,
+      },
+      headers: getAuthHeader(),
+    })
+    .then(resp => ({
+      isSuccess: true,
+      data: resp.data,
+    }))
 }

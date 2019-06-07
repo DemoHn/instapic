@@ -122,7 +122,7 @@ const Home: React.FC = () => {
                     description={post.description}
                     user={{
                       name: post.user.name,
-                      link: `users/${post.user.userword}`,
+                      link: `/users/${post.user.userword}`,
                     }}
                   />
                 </DesktopCardWrapper>

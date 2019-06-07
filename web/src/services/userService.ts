@@ -65,12 +65,11 @@ export function removeToken() {
   window.localStorage.removeItem(SESSION_KEY)
 }
 
-function getAuthHeader() {
+export function getAuthHeader() {
   const token = window.localStorage.getItem(SESSION_KEY)
   return { Authorization: `Bearer ${token || ''}` }
 }
 
 export function hasToken() {
-  console.log(window.localStorage.getItem(SESSION_KEY))
   return !_.isNil(window.localStorage.getItem(SESSION_KEY))
 }
