@@ -54,6 +54,17 @@ export function getUser(): Promise<Response<UserResponse>> {
     }))
 }
 
+export function validateUserword(userword: string): Promise<Response<UserResponse>> {
+  return axios
+    .get(`/api/v1.0/users/${userword}/validate`, {
+      headers: getAuthHeader(),
+    })
+    .then(resp => ({
+      isSuccess: true,
+      data: resp.data,
+    }))
+}
+
 // localstorage to store sessions
 const SESSION_KEY = 'instapic_session_key'
 

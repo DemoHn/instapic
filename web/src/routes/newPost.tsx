@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { isMobile } from 'react-device-detect'
-import { Button, Divider } from 'semantic-ui-react'
+import { Button } from 'semantic-ui-react'
+import styled from 'styled-components'
 
 // components
 import MobileNavHeader from '../components/MobileNavHeader'
@@ -46,6 +47,10 @@ interface PostPageProps {
   onSubmit: (x: { description: string; imageIds: number[] }) => any
   onImageUpload: (file: any) => Promise<{ id: number; url: string }>
 }
+
+const Tag = styled.h2`
+  padding-top: 20px;
+`
 const DesktopNewPostPage: React.FC<PostPageProps> = props => {
   const userInfo = useUserModel()
 
@@ -53,8 +58,7 @@ const DesktopNewPostPage: React.FC<PostPageProps> = props => {
   const { onSubmit, onImageUpload } = props
   return (
     <DesktopLayout header={<DesktopHomeHeader hideUserBar={false} user={userInfo} />}>
-      <h2>New Post</h2>
-      <Divider />
+      <Tag>New Post</Tag>
       <NewPostForm ref={postRef} imgColumnItems={4} uploadAction={onImageUpload} />
       <Button
         primary

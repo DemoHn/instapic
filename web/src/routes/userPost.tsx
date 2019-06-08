@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { isMobile } from 'react-device-detect'
+import styled from 'styled-components'
 
 // components
 import MobileNavHeader from '../components/MobileNavHeader'
@@ -13,7 +14,12 @@ import MobileLayout from '../layouts/MobileLayout'
 import DesktopLayout from '../layouts/DesktopLayout'
 // services
 import { listUserPosts, PostResponse } from '../services/postService'
-import { getUser, hasToken, UserResponse } from '../services/userService'
+import {
+  getUser,
+  validateUserword,
+  hasToken,
+  UserResponse,
+} from '../services/userService'
 
 const usePostsModel = (
   isMobile: boolean,
@@ -54,9 +60,15 @@ const usePostsModel = (
   return [onTopRefresh, onBottomRefresh]
 }
 
-const useUserModel = (isMobile: boolean) => {
-  const [userInfo, setUserInfo] = useState({
+const useUserModel = (
+  userword: string
+): [{ isLogin: boolean; userName: string }, { userName: string }] => {
+  const [currentUser, setCurrentUser] = useState({
     isLogin: false,
+    userName: '',
+  })
+
+  const [uploadUser, setUploadUser] = useState({
     userName: '',
   })
 
@@ -65,27 +77,36 @@ const useUserModel = (isMobile: boolean) => {
       const { isSuccess, data } = await getUser()
       if (isSuccess) {
         const respData = data as UserResponse
-        setUserInfo({
+        setCurrentUser({
           isLogin: true,
+          userName: respData.name,
+        })
+      }
+
+      // fetch external user data
+      const resp = await validateUserword(userword)
+      if (resp.isSuccess) {
+        const respData = resp.data as UserResponse
+        setUploadUser({
           userName: respData.name,
         })
       }
     }
 
-    if (hasToken() && !isMobile) {
+    if (hasToken()) {
       fetchUserData()
     }
-  }, [isMobile])
+  }, [userword])
 
-  return userInfo
+  return [currentUser, uploadUser]
 }
 
 const MobileUserPostPage: React.FC<{ userword: string }> = props => {
   const { userword } = props
   const [onTopRefresh, onBottomRefresh] = usePostsModel(isMobile, userword)
-  const userInfo = useUserModel(false)
+  const [, uploader] = useUserModel(userword)
 
-  const title = userInfo.isLogin ? `${userInfo.userName}'s Posts` : ''
+  const title = uploader.userName === '' ? '' : `${uploader.userName}'s Posts`
   return (
     <MobileLayout
       header={<MobileNavHeader leftLink="/" middleComponent={<span>{title}</span>} />}
@@ -109,12 +130,18 @@ const MobileUserPostPage: React.FC<{ userword: string }> = props => {
   )
 }
 
+// desktop styles
+const Tag = styled.h2`
+  padding-top: 20px;
+`
+
 const DesktopUserPostPage: React.FC<{ userword: string }> = props => {
   const { userword } = props
   const [, onBottomRefresh] = usePostsModel(false, userword)
-  const userInfo = useUserModel(false)
+  const [userInfo, uploader] = useUserModel(userword)
   return (
     <DesktopLayout header={<DesktopHomeHeader hideUserBar={false} user={userInfo} />}>
+      {uploader.userName === '' ? null : <Tag>{uploader.userName}'s Posts</Tag>}
       <DesktopPostsContainer
         onInit={async () => {
           const [hasMore, updatedPosts] = await onBottomRefresh()

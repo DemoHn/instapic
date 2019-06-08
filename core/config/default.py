@@ -12,7 +12,7 @@ def load_default():
     'USE_LOCAL_IMAGE_PROVIDER': True,
     # valid only if 'USE_LOCAL_IMAGE_PROVIDER' = True
     'LOCAL_IMAGE_DATADIR': 'data/images',
-    'IMAGE_URL_PREFIX': 'images/',
+    'IMAGE_URL_PREFIX': '/images/',
     'MAX_CONTENT_LENGTH': 32 * 1024 * 1024, # 32M
     'IMAGE_MAX_ITEMS': 4,
     'IMAGE_MIN_ITEMS': 1,

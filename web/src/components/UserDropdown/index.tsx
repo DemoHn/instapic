@@ -14,7 +14,6 @@ const IconSpace = styled.span`
 `
 const Label = styled.span`
   display: inline-block;
-  width: 60px;
   text-align: left;
 `
 
@@ -29,34 +28,45 @@ const UserDropdown: React.FC<UserDropdownProps> = props => {
   return (
     <DropdownFrame>
       <Icon name="user outline" />
-      {!isLogin ? null : (
-        <span>
-          <IconSpace />
-          <Dropdown text={userName || ''} compact={true}>
-            <Dropdown.Menu direction="left">
+      <span>
+        <IconSpace />
+        <Dropdown text={userName || ''} compact={true}>
+          <Dropdown.Menu direction="left">
+            {!isLogin ? (
               <Dropdown.Item>
-                <Link to="/new_post">
+                <Link to="/new_user">
                   <Icon.Group>
-                    <Icon name="file image outline" />
-                    <Icon corner name="add" />
+                    <Icon name="user circle outline" />
                   </Icon.Group>
                   <IconSpace />
-                  <Label>New Post</Label>
+                  <Label>Register / Login</Label>
                 </Link>
               </Dropdown.Item>
+            ) : null}
+            <Dropdown.Item>
+              <Link to="/new_post">
+                <Icon.Group>
+                  <Icon name="file image outline" />
+                  <Icon corner name="add" />
+                </Icon.Group>
+                <IconSpace />
+                <Label>New Post</Label>
+              </Link>
+            </Dropdown.Item>
+            {isLogin ? (
               <Dropdown.Item>
-                <span>
+                <Link to="/logout">
                   <Icon.Group>
                     <Icon name="user circle outline" />
                   </Icon.Group>
                   <IconSpace />
                   <Label>Logout</Label>
-                </span>
+                </Link>
               </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        </span>
-      )}
+            ) : null}
+          </Dropdown.Menu>
+        </Dropdown>
+      </span>
     </DropdownFrame>
   )
 }
