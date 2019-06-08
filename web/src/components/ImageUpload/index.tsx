@@ -7,6 +7,7 @@ export interface ImageUploadError {
   title: string
   subTitle: string
 }
+
 const FileInput = styled.input`
   opacity: 0;
   position: absolute;
@@ -37,7 +38,6 @@ const IconWrapper = styled.span`
 
 const ImageDisplayWrapper = styled.div`
   position: relative;
-  border: 1px solid #aaa;
 `
 
 const CloseButtonWrapper = styled.div`
@@ -99,11 +99,11 @@ const handleFileUpload = (
   // upload action
   const uploadAction = props.uploadAction
   return uploadAction(file)
-    .then((url: string) => {
+    .then((resp: any) => {
       setIsUploaded(true)
       // @ts-ignore
       setFile(fileObject.dataURL)
-      props.onUploadSuccess(url)
+      props.onUploadSuccess(resp.id, resp.url)
     })
     .catch((err: any) => {
       setIsUploaded(false)
@@ -111,12 +111,11 @@ const handleFileUpload = (
     })
 }
 
-const fadeOutFrame = (eProps: ImageExactUploadProps, frameElem: any) => () => {
+const fadeOutFrame = (props: ImageExactUploadProps, frameElem: any) => () => {
   frameElem.current.style.opacity = 0
   // display: none after timeout
   setTimeout(() => {
-    frameElem.current.style.display = 'none'
-    eProps.onImageRemoved()
+    props.onImageRemoved(props.identifier)
   }, 600)
 }
 
@@ -124,7 +123,7 @@ const defaultImageUploadProps = {
   maxFileSize: 16 * 1024 * 1024, //16M
   allowedExtensions: ['.jpg', '.jpeg', '.bmp', '.png'],
   uploadAction: (file: string) => {},
-  onUploadSuccess: (previewUrl: string) => {},
+  onUploadSuccess: (imageId: number, previewUrl: string) => {},
   onUploadFail: (error: ImageUploadError) => {
     window.alert(error.title + ': ' + error.subTitle)
   },
@@ -137,6 +136,7 @@ export interface ImageUploadProps {
   onUploadFail?: Function
   onImageRemoved?: Function
   maxFileSize?: number
+  identifier: string
   allowedExtensions?: string[]
 }
 
@@ -146,6 +146,7 @@ interface ImageExactUploadProps {
   onUploadFail: Function
   onImageRemoved: Function
   maxFileSize: number
+  identifier: string
   allowedExtensions: string[]
 }
 
@@ -157,6 +158,7 @@ const ImageUpload: React.FC<ImageUploadProps> = props => {
   const [size, setSize] = useState(0)
 
   const eProps: ImageExactUploadProps = Object.assign(defaultImageUploadProps, props)
+
   // readjust size
   useEffect(() => {
     if (frameElem && frameElem.current) {
@@ -164,7 +166,8 @@ const ImageUpload: React.FC<ImageUploadProps> = props => {
       current.style.height = current.clientWidth + 'px'
       setSize(current.clientWidth)
     }
-  }, [frameElem])
+  }, [])
+
   return (
     <FileUplaodFrame ref={frameElem}>
       {!isUploaded ? (
@@ -192,9 +195,9 @@ const ImageUpload: React.FC<ImageUploadProps> = props => {
       ) : (
         <ImageDisplayWrapper>
           <ImageDisplay source={file} size={size} />
-          <CloseButtonWrapper onClick={fadeOutFrame(eProps, frameElem)}>
+          {/*<CloseButtonWrapper onClick={fadeOutFrame(eProps, frameElem)}>
             <Icon name="close" circular inverted size="small" />
-          </CloseButtonWrapper>
+      </CloseButtonWrapper>*/}
         </ImageDisplayWrapper>
       )}
     </FileUplaodFrame>

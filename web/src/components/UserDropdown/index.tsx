@@ -1,5 +1,6 @@
 import React from 'react'
 import { Icon, Dropdown } from 'semantic-ui-react'
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 // styles
@@ -34,14 +35,14 @@ const UserDropdown: React.FC<UserDropdownProps> = props => {
           <Dropdown text={userName || ''} compact={true}>
             <Dropdown.Menu direction="left">
               <Dropdown.Item>
-                <span>
+                <Link to="/new_post">
                   <Icon.Group>
                     <Icon name="file image outline" />
                     <Icon corner name="add" />
                   </Icon.Group>
                   <IconSpace />
                   <Label>New Post</Label>
-                </span>
+                </Link>
               </Dropdown.Item>
               <Dropdown.Item>
                 <span>

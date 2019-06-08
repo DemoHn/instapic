@@ -15,6 +15,6 @@ const Frame = styled.div`
 `
 storiesOf('ImageUpload', module).add('default', () => (
   <Frame>
-    <ImageUpload uploadAction={expUploadAction} />
+    <ImageUpload uploadAction={expUploadAction} identifier="idf" />
   </Frame>
 ))

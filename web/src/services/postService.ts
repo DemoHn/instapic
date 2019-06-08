@@ -49,3 +49,24 @@ export function listUserPosts(
       data: resp.data,
     }))
 }
+
+export function newPost(
+  description: string,
+  imageIds: number[]
+): Promise<Response<PostResponse>> {
+  return axios
+    .post(
+      '/api/v1.0/posts',
+      {
+        description,
+        image_ids: imageIds,
+      },
+      {
+        headers: getAuthHeader(),
+      }
+    )
+    .then(resp => ({
+      isSuccess: true,
+      data: resp.data,
+    }))
+}
