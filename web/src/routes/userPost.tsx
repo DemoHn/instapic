@@ -13,7 +13,7 @@ import DesktopPostsContainer from '../components/DesktopPostsContainer'
 import MobileLayout from '../layouts/MobileLayout'
 import DesktopLayout from '../layouts/DesktopLayout'
 // services
-import { listUserPosts, PostResponse } from '../services/postService'
+import { listUserPosts, PostResponse, PostsResponse } from '../services/postService'
 import {
   getUser,
   validateUserword,
@@ -33,7 +33,8 @@ const usePostsModel = (
   // get posts list from backend API
   useEffect(() => {
     const fetchData = async () => {
-      const { data: newPostsInfo } = await listUserPosts(userword, PAGE_LIMIT)
+      const { data } = await listUserPosts(userword, PAGE_LIMIT)
+      const newPostsInfo = data as PostsResponse
       setPosts(newPostsInfo.posts)
       setCursor(newPostsInfo.cursor)
     }
@@ -41,7 +42,8 @@ const usePostsModel = (
   }, [PAGE_LIMIT, userword])
 
   const onTopRefresh = useCallback(async () => {
-    const { data: newPostsInfo } = await listUserPosts(userword, PAGE_LIMIT)
+    const { data } = await listUserPosts(userword, PAGE_LIMIT)
+    const newPostsInfo = data as PostsResponse
     const updatedPosts = newPostsInfo.posts
     setPosts(updatedPosts)
     setCursor(newPostsInfo.cursor)
@@ -49,7 +51,8 @@ const usePostsModel = (
   }, [PAGE_LIMIT, userword])
 
   const onBottomRefresh = useCallback(async () => {
-    const { data: postInfo } = await listUserPosts(userword, PAGE_LIMIT, cursor)
+    const { data } = await listUserPosts(userword, PAGE_LIMIT, cursor)
+    const postInfo = data as PostsResponse
     const hasMore = postInfo.has_more
     const updatedPosts = posts.concat(postInfo.posts)
     setPosts(updatedPosts)

@@ -15,7 +15,7 @@ import DesktopLayout from '../layouts/DesktopLayout'
 // services
 import { getUser, hasToken, UserResponse } from '../services/userService'
 import { newPost } from '../services/postService'
-import { uploadImage } from '../services/imageService'
+import { uploadImage, ImageResponse } from '../services/imageService'
 
 const useUserModel = () => {
   const [userInfo, setUserInfo] = useState({
@@ -119,7 +119,7 @@ const NewPost: React.FC = () => {
 
     const { data } = await uploadImage(formData)
 
-    return data
+    return data as ImageResponse
   }
   return isMobile ? (
     <MobileNewPostPage onSubmit={onSubmit} onImageUpload={onImageUpload} />
