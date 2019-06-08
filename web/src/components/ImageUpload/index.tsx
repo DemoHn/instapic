@@ -39,7 +39,7 @@ const IconWrapper = styled.span`
 const ImageDisplayWrapper = styled.div`
   position: relative;
 `
-
+/*
 const CloseButtonWrapper = styled.div`
   position: absolute;
   top: -10px;
@@ -48,6 +48,7 @@ const CloseButtonWrapper = styled.div`
   width: 20px;
   cursor: pointer;
 `
+*/
 const readFile = (file: any) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -110,7 +111,7 @@ const handleFileUpload = (
       props.onUploadFail(err)
     })
 }
-
+/*
 const fadeOutFrame = (props: ImageExactUploadProps, frameElem: any) => () => {
   frameElem.current.style.opacity = 0
   // display: none after timeout
@@ -118,7 +119,7 @@ const fadeOutFrame = (props: ImageExactUploadProps, frameElem: any) => () => {
     props.onImageRemoved(props.identifier)
   }, 600)
 }
-
+*/
 const defaultImageUploadProps = {
   maxFileSize: 16 * 1024 * 1024, //16M
   allowedExtensions: ['.jpg', '.jpeg', '.bmp', '.png'],

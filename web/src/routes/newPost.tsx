@@ -106,13 +106,14 @@ const MobileNewPostPage: React.FC<PostPageProps> = props => {
 const NewPost: React.FC = () => {
   const onSubmit = async (formData: any) => {
     const { isSuccess } = await newPost(formData.description, formData.imageIds)
+    console.log(isSuccess)
   }
 
   const onImageUpload = async (file: any) => {
     const formData = new FormData()
     formData.append('image', file)
 
-    const { isSuccess, data } = await uploadImage(formData)
+    const { data } = await uploadImage(formData)
 
     return data
   }

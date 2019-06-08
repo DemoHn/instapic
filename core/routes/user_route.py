@@ -4,8 +4,13 @@ from core.services.user_service import (
   register_user,
   login_user,
   remove_token,
-  get_user
+  get_user,  
 )
+
+from core.services.post_service import (
+  validate_userword
+)
+
 from core.middlewares import auth
 
 @api.route('/users/register', methods=['POST'])
@@ -44,3 +49,12 @@ def logout():
 def get_user_ctrl():
   user_id = g.user_id
   return jsonify(get_user(user_id))
+
+@api.route('/users/<userword>/validate', methods=['GET'])
+@auth
+@swag_from('specs/validate_userword.yml', validation=False)
+def valiate_userword_ctrl(userword):
+  user_id = validate_userword(userword)
+  return jsonify(get_user(user_id))
+
+  
