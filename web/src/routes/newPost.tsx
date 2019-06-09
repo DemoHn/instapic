@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useRef } from 'react'
 import { isMobile } from 'react-device-detect'
 import { Button } from 'semantic-ui-react'
 import styled from 'styled-components'
-
+import { Redirect } from 'react-router-dom'
 // components
 import MobileNavHeader from '../components/MobileNavHeader'
 import PostButton from '../components/PostButton'
@@ -13,35 +13,11 @@ import MobileLayout from '../layouts/MobileLayout'
 import DesktopLayout from '../layouts/DesktopLayout'
 
 // services
-import { getUser, hasToken, UserResponse } from '../services/userService'
 import { newPost } from '../services/postService'
 import { uploadImage, ImageResponse } from '../services/imageService'
 
-const useUserModel = () => {
-  const [userInfo, setUserInfo] = useState({
-    isLogin: false,
-    userName: '',
-  })
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const { isSuccess, data } = await getUser()
-      if (isSuccess) {
-        const respData = data as UserResponse
-        setUserInfo({
-          isLogin: true,
-          userName: respData.name,
-        })
-      }
-    }
-
-    if (hasToken()) {
-      fetchUserData()
-    }
-  }, [])
-
-  return userInfo
-}
+// hooks
+import useAuth from '../hooks/auth'
 
 interface PostPageProps {
   onSubmit: (x: { description: string; imageIds: number[] }) => any
@@ -51,13 +27,11 @@ interface PostPageProps {
 const Tag = styled.h2`
   padding-top: 20px;
 `
-const DesktopNewPostPage: React.FC<PostPageProps> = props => {
-  const userInfo = useUserModel()
-
+const DesktopNewPostPage: React.FC<PostPageProps & { user: any }> = props => {
   const postRef = useRef(null)
   const { onSubmit, onImageUpload } = props
   return (
-    <DesktopLayout header={<DesktopHomeHeader hideUserBar={false} user={userInfo} />}>
+    <DesktopLayout header={<DesktopHomeHeader hideUserBar={false} user={props.user} />}>
       <Tag>New Post</Tag>
       <NewPostForm ref={postRef} imgColumnItems={4} uploadAction={onImageUpload} />
       <Button
@@ -107,25 +81,42 @@ const MobileNewPostPage: React.FC<PostPageProps> = props => {
   )
 }
 
+const onSubmit = async (formData: any) => {
+  const { isSuccess } = await newPost(formData.description, formData.imageIds)
+  console.log(isSuccess)
+}
+
+const onImageUpload = async (file: any) => {
+  const formData = new FormData()
+  formData.append('image', file)
+
+  const { data } = await uploadImage(formData)
+
+  return data as ImageResponse
+}
 const NewPost: React.FC = () => {
-  const onSubmit = async (formData: any) => {
-    const { isSuccess } = await newPost(formData.description, formData.imageIds)
-    console.log(isSuccess)
-  }
+  const authResult = useAuth((err: any) => {})
 
-  const onImageUpload = async (file: any) => {
-    const formData = new FormData()
-    formData.append('image', file)
-
-    const { data } = await uploadImage(formData)
-
-    return data as ImageResponse
-  }
-  return isMobile ? (
-    <MobileNewPostPage onSubmit={onSubmit} onImageUpload={onImageUpload} />
-  ) : (
-    <DesktopNewPostPage onSubmit={onSubmit} onImageUpload={onImageUpload} />
-  )
+  return authResult.hasResult ? (
+    authResult.isLogin ? (
+      isMobile ? (
+        <MobileNewPostPage onSubmit={onSubmit} onImageUpload={onImageUpload} />
+      ) : (
+        <DesktopNewPostPage
+          onSubmit={onSubmit}
+          onImageUpload={onImageUpload}
+          user={authResult}
+        />
+      )
+    ) : (
+      <Redirect
+        to={{
+          pathname: '/new_user',
+          search: '?ref=/new_post',
+        }}
+      />
+    )
+  ) : null
 }
 
 export default NewPost

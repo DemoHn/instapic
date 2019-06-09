@@ -58,9 +58,9 @@ const MobilePostsContainer: React.FC<MobilePostsContainerProps> = props => {
         return hasMore
       }}
     >
-      {posts.map(post => {
+      {posts.map((post, index) => {
         return (
-          <CardWrapper>
+          <CardWrapper key={index}>
             <PostItemCard
               postTimestamp={post.created_at}
               images={post.image_urls}

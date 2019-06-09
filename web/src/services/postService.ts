@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Response } from './respHelper'
+import { Response, handleSuccess, handleError } from './respHelper'
 import { getAuthHeader } from './userService'
 export interface UserResponse {
   id: number
@@ -20,7 +20,10 @@ export interface PostsResponse {
   has_more: boolean
   posts: PostResponse[]
 }
-export function getPosts(limit?: number, cursor?: number): Promise<PostsResponse> {
+export function getPosts(
+  limit?: number,
+  cursor?: number
+): Promise<Response<PostsResponse>> {
   return axios
     .get('/api/v1.0/posts', {
       params: {
@@ -28,7 +31,8 @@ export function getPosts(limit?: number, cursor?: number): Promise<PostsResponse
         cursor,
       },
     })
-    .then(resp => resp.data as PostsResponse)
+    .then(data => handleSuccess<PostsResponse>(data))
+    .catch(err => handleError<PostsResponse>(err))
 }
 
 export function listUserPosts(

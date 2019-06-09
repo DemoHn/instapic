@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Response } from './respHelper'
+import { Response, handleSuccess, handleError } from './respHelper'
 import _ from 'lodash'
 
 export interface UserRequest {
@@ -48,10 +48,8 @@ export function getUser(): Promise<Response<UserResponse>> {
     .get('/api/v1.0/users', {
       headers: getAuthHeader(),
     })
-    .then(resp => ({
-      isSuccess: true,
-      data: resp.data,
-    }))
+    .then(data => handleSuccess<UserResponse>(data))
+    .catch(err => handleError<UserResponse>(err))
 }
 
 export function validateUserword(userword: string): Promise<Response<UserResponse>> {

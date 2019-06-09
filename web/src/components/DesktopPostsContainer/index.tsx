@@ -129,9 +129,9 @@ const DesktopPostsContainer: React.FC<DesktopPostsContainerProps> = props => {
 
   return (
     <DesktopCardContainer ref={containerRef}>
-      {posts.map(post => {
+      {posts.map((post, index) => {
         return (
-          <DesktopCardWrapper>
+          <DesktopCardWrapper key={index}>
             <PostItemCard
               postTimestamp={post.created_at}
               images={post.image_urls}

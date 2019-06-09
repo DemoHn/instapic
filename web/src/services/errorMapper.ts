@@ -48,7 +48,7 @@ export function mapKnownError(respData: any): ErrorObject {
     title: errorMapItem ? errorMapItem.title : 'Server Error',
     description: errorMapItem
       ? errorMapItem.description || respData.message
-      : respData.message,
+      : respData.message || 'please try again',
   }
 }
 

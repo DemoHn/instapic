@@ -105,8 +105,8 @@ const Slider: React.FC<SliderProps> = props => {
       ) : null}
       <div style={styles.container}>
         <div style={styles.loader}>
-          {sources.map(source => (
-            <ImageDisplay source={source} size={size} />
+          {sources.map((source, index) => (
+            <ImageDisplay key={index} source={source} size={size} />
           ))}
         </div>
       </div>
