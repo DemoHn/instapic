@@ -48,10 +48,8 @@ export function listUserPosts(
       },
       headers: getAuthHeader(),
     })
-    .then(resp => ({
-      isSuccess: true,
-      data: resp.data,
-    }))
+    .then(data => handleSuccess<PostsResponse>(data))
+    .catch(err => handleError<PostsResponse>(err))
 }
 
 export function newPost(
@@ -69,8 +67,6 @@ export function newPost(
         headers: getAuthHeader(),
       }
     )
-    .then(resp => ({
-      isSuccess: true,
-      data: resp.data,
-    }))
+    .then(data => handleSuccess<PostResponse>(data))
+    .catch(err => handleError<PostResponse>(err))
 }

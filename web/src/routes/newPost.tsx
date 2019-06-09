@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import { Button } from 'semantic-ui-react'
 import styled from 'styled-components'
@@ -8,6 +8,7 @@ import MobileNavHeader from '../components/MobileNavHeader'
 import PostButton from '../components/PostButton'
 import NewPostForm from '../components/NewPostForm'
 import DesktopHomeHeader from '../components/DesktopHomeHeader'
+import { ModalFactory } from '../components/Modal'
 // layouts
 import MobileLayout from '../layouts/MobileLayout'
 import DesktopLayout from '../layouts/DesktopLayout'
@@ -81,9 +82,30 @@ const MobileNewPostPage: React.FC<PostPageProps> = props => {
   )
 }
 
-const onSubmit = async (formData: any) => {
-  const { isSuccess } = await newPost(formData.description, formData.imageIds)
-  console.log(isSuccess)
+const onSubmit = (uiHooks: {
+  triggerErrorModal: any
+  triggerConfirmModal: any
+  setConfirmRedirect: any
+  setRetry: any
+}) => async (formData: any) => {
+  const { isSuccess, error } = await newPost(formData.description, formData.imageIds)
+  if (isSuccess) {
+    uiHooks.triggerConfirmModal({
+      type: 'confirm',
+      title: 'Success',
+      description: 'Your post has been successfully created!',
+      onConfirm: () => {
+        uiHooks.setConfirmRedirect(true)
+      },
+    })
+  } else {
+    const err = error as any
+    uiHooks.triggerErrorModal({
+      type: 'confirm',
+      title: err.title,
+      description: err.description,
+    })
+  }
 }
 
 const onImageUpload = async (file: any) => {
@@ -94,20 +116,38 @@ const onImageUpload = async (file: any) => {
 
   return data as ImageResponse
 }
+
 const NewPost: React.FC = () => {
-  const authResult = useAuth((err: any) => {})
+  const authResult = useAuth()
+  // create massive modals
+  const [triggerErrorModal, createErrorModal] = ModalFactory.useModal()
+  const [triggerConfirmModal, createConfirmModal] = ModalFactory.useModal()
+
+  // redirect
+  const [confirmRedirect, setConfirmRedirect] = useState(false)
+
+  const uiHooks: any = {
+    triggerErrorModal,
+    triggerConfirmModal,
+    setConfirmRedirect,
+  }
 
   return authResult.hasResult ? (
     authResult.isLogin ? (
-      isMobile ? (
-        <MobileNewPostPage onSubmit={onSubmit} onImageUpload={onImageUpload} />
-      ) : (
-        <DesktopNewPostPage
-          onSubmit={onSubmit}
-          onImageUpload={onImageUpload}
-          user={authResult}
-        />
-      )
+      <div>
+        {confirmRedirect ? <Redirect to="/" /> : null}
+        {isMobile ? (
+          <MobileNewPostPage onSubmit={onSubmit(uiHooks)} onImageUpload={onImageUpload} />
+        ) : (
+          <DesktopNewPostPage
+            onSubmit={onSubmit(uiHooks)}
+            onImageUpload={onImageUpload}
+            user={authResult}
+          />
+        )}
+        {createErrorModal()}
+        {createConfirmModal()}
+      </div>
     ) : (
       <Redirect
         to={{

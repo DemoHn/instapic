@@ -62,3 +62,5 @@ const CustomModal: React.FC<ModalProps> = (props, ref) => {
 }
 
 export default forwardRef(CustomModal)
+
+export * from './factory'

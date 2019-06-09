@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { isMobile } from 'react-device-detect'
 import styled from 'styled-components'
-
+import { Redirect } from 'react-router-dom'
 // components
 import MobileNavHeader from '../components/MobileNavHeader'
 import HomeFooter from '../components/HomeFooter'
@@ -14,12 +14,10 @@ import MobileLayout from '../layouts/MobileLayout'
 import DesktopLayout from '../layouts/DesktopLayout'
 // services
 import { listUserPosts, PostResponse, PostsResponse } from '../services/postService'
-import {
-  getUser,
-  validateUserword,
-  hasToken,
-  UserResponse,
-} from '../services/userService'
+import { validateUserword, UserResponse } from '../services/userService'
+
+// hooks
+import useAuth from '../hooks/auth'
 
 const usePostsModel = (
   isMobile: boolean,
@@ -63,29 +61,13 @@ const usePostsModel = (
   return [onTopRefresh, onBottomRefresh]
 }
 
-const useUserModel = (
-  userword: string
-): [{ isLogin: boolean; userName: string }, { userName: string }] => {
-  const [currentUser, setCurrentUser] = useState({
-    isLogin: false,
-    userName: '',
-  })
-
+const useUploader = (userword: string): { userName: string } => {
   const [uploadUser, setUploadUser] = useState({
     userName: '',
   })
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const { isSuccess, data } = await getUser()
-      if (isSuccess) {
-        const respData = data as UserResponse
-        setCurrentUser({
-          isLogin: true,
-          userName: respData.name,
-        })
-      }
-
       // fetch external user data
       const resp = await validateUserword(userword)
       if (resp.isSuccess) {
@@ -96,18 +78,16 @@ const useUserModel = (
       }
     }
 
-    if (hasToken()) {
-      fetchUserData()
-    }
+    fetchUserData()
   }, [userword])
 
-  return [currentUser, uploadUser]
+  return uploadUser
 }
 
 const MobileUserPostPage: React.FC<{ userword: string }> = props => {
   const { userword } = props
   const [onTopRefresh, onBottomRefresh] = usePostsModel(isMobile, userword)
-  const [, uploader] = useUserModel(userword)
+  const uploader = useUploader(userword)
 
   const title = uploader.userName === '' ? '' : `${uploader.userName}'s Posts`
   return (
@@ -138,12 +118,12 @@ const Tag = styled.h2`
   padding-top: 20px;
 `
 
-const DesktopUserPostPage: React.FC<{ userword: string }> = props => {
+const DesktopUserPostPage: React.FC<{ userword: string; user: any }> = props => {
   const { userword } = props
   const [, onBottomRefresh] = usePostsModel(false, userword)
-  const [userInfo, uploader] = useUserModel(userword)
+  const uploader = useUploader(userword)
   return (
-    <DesktopLayout header={<DesktopHomeHeader hideUserBar={false} user={userInfo} />}>
+    <DesktopLayout header={<DesktopHomeHeader hideUserBar={false} user={props.user} />}>
       {uploader.userName === '' ? null : <Tag>{uploader.userName}'s Posts</Tag>}
       <DesktopPostsContainer
         onInit={async () => {
@@ -162,14 +142,31 @@ export interface UserPostProps {
   match: {
     params: any
   }
+  location: {
+    pathname: string
+  }
 }
-const UserPost: React.FC<UserPostProps> = ({ match }) => {
+
+const UserPost: React.FC<UserPostProps> = ({ match, location }) => {
   const { userword } = match.params
-  return isMobile ? (
-    <MobileUserPostPage userword={userword} />
-  ) : (
-    <DesktopUserPostPage userword={userword} />
-  )
+  const authResult = useAuth()
+
+  return authResult.hasResult ? (
+    authResult.isLogin ? (
+      isMobile ? (
+        <MobileUserPostPage userword={userword} />
+      ) : (
+        <DesktopUserPostPage userword={userword} user={authResult} />
+      )
+    ) : (
+      <Redirect
+        to={{
+          pathname: '/new_user',
+          search: `?ref=${location.pathname}`,
+        }}
+      />
+    )
+  ) : null
 }
 
 export default UserPost
