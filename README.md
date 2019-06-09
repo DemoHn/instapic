@@ -7,27 +7,27 @@
 __InstaPic__ is a simple instagram-like demo application that users could post his/her feelings with images and checkout other people's posts.
 
 Features on Backend:
-	•	[ X ] Implement backend on Flask
-	•	[ X ] Users can register by username
-	•	[ X ] Users can submit post that includes an image and short text description
-	•	[ X ] Users can view all posts sorted by time
-	•	[ X ] Users can view posts from a specific user
-	•	[ X ] Validation and error handling
-	•	[ X ] Tests
-  •	[ X ] Use __sqlite__ as database driver
-	•	[ X ] Performance optimization
-	•	[ X ] Pagination
+	- [ X ] Implement backend on Flask
+	- [ X ] Users can register by username
+	- [ X ] Users can submit post that includes an image and short text description
+	- [ X ] Users can view all posts sorted by time
+	- [ X ] Users can view posts from a specific user
+	- [ X ] Validation and error handling
+	- [ X ] Tests
+  - [ X ] Use __sqlite__ as database driver
+	- [ X ] Performance optimization
+	- [ X ] Pagination
 
 Features on Frontend:
-	•	[ X ] Implement frontend on React
-	•	[ X ] Allow user to register by username
-	•	[ X ] Users can submit post that includes an image and short text description
-	•	[ X ] Users can view all posts sorted by time
-	•	[ X ] Users can view posts from a specific user
-	•	[ X ] Validation and error handling
-	•	[   ] Tests  <-- since no time to write frontend tests
-	•	[ X ] Performance optimization
-	•	[ X ] Integrate with <del>Redux</del> and React Router
+	- [ X ] Implement frontend on React
+	- [ X ] Allow user to register by username
+	- [ X ] Users can submit post that includes an image and short text description
+	- [ X ] Users can view all posts sorted by time
+	- [ X ] Users can view posts from a specific user
+	- [ X ] Validation and error handling
+	- [   ] Tests  <-- since no time to write frontend tests
+	- [ X ] Performance optimization
+	- [ X ] Integrate with <del>Redux</del> and React Router
   • [ X ] Use storybook to manage all single components
   • [ X ] Use typescript for static type checking
 
@@ -46,5 +46,14 @@ cd instapic
 Then create a virtual python environment for backend:
 ```
 $ virtualenv venv
-$ 
+$ source venv/bin/activate
+
+# here we enter the virtual env
+(venv) cd core
+(venv) pip install -r requirements.txt
+```
+
+Next run the backend server:
+```
+(venv) FLASK_APP=core FLASK_ENV=development flask run
 ```
