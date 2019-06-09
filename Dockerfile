@@ -24,4 +24,4 @@ RUN ls -a core/
 COPY --from=frontend-builder /srv/build/static/. core/static/.
 COPY --from=frontend-builder /srv/build/*.js /srv/build/index.html /srv/build/manifest.json /srv/build/favicon.ico core/static/
 
-ENTRYPOINT ["waitress", "--call", "core:create_app"]
+ENTRYPOINT ["waitress-serve", "--call", "core:create_app"]
