@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
 import { isMobile } from 'react-device-detect'
-
+import { Redirect } from 'react-router-dom'
 // layouts
 import DesktopLayout from '../layouts/DesktopLayout'
 import MobileLayout from '../layouts/MobileLayout'
@@ -9,14 +9,8 @@ import MobileLayout from '../layouts/MobileLayout'
 import MobileNavHeader from '../components/MobileNavHeader'
 import DesktopHomeHeader from '../components/DesktopHomeHeader'
 import RegisterForm from '../components/RegisterForm'
-import ToastMessage from '../components/ToastMessage'
+import { ModalFactory } from '../components/Modal'
 
-// toast
-import {
-  ToastProvider,
-  withToastManager,
-  ToastManagerProps,
-} from 'react-toast-notifications'
 // service
 import { userLogin, userRegister } from '../services/userService'
 
@@ -38,116 +32,116 @@ const FormWrapper = styled.div`
 const MobileContainerFrame = styled.div`
   margin-top: 90px;
 `
-// submit handlers
-const useUserActions = (toastManager: any) => {
-  const [handled, setHandled] = useState(false)
 
+function parseQuery(queryString: string) {
+  var query: Record<string, any> = {}
+  var pairs = (queryString[0] === '?' ? queryString.substr(1) : queryString).split('&')
+  for (var i = 0; i < pairs.length; i++) {
+    var pair = pairs[i].split('=')
+    query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '')
+  }
+  return query
+}
+
+// submit handlers
+const useUserActions = (triggerModal: any, setConfirmRedirect: any) => {
   const onLoginSubmit = useCallback(
     async (name: string, password: string) => {
-      if (!handled) {
-        const { isSuccess } = await userLogin({ name, password })
-        setHandled(true)
-        if (isSuccess) {
-          toastManager.add(
-            {
-              title: 'Login Succeeded!',
-              subTitle: 'This page will be redirected quickly',
-            },
-            {
-              appearance: 'info',
-              autoDismiss: true,
-            },
-            () => {
-              setHandled(false)
-            }
-          )
-        }
+      const { isSuccess, error } = await userLogin({ name, password })
+      if (isSuccess) {
+        triggerModal({
+          type: 'confirm',
+          title: 'Login Succeeded!',
+          description: 'click `Get it` to continue',
+          onConfirm: () => {
+            setConfirmRedirect(true)
+          },
+        })
+      } else {
+        const err = error as any
+        triggerModal({
+          type: 'confirm',
+          title: err.title,
+          description: err.description,
+        })
       }
     },
-    [handled, toastManager]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [setConfirmRedirect]
   )
 
   const onRegisterSubmit = useCallback(
     async (name: string, password: string) => {
       // ensure not duplicate submit
-      if (!handled) {
-        const { isSuccess } = await userRegister({ name, password })
-        if (isSuccess) {
-          toastManager.add(
-            {
-              title: 'Register Succeeded!',
-              subTitle: 'This page will be redirected quickly',
-            },
-            {
-              appearance: 'info',
-              autoDismiss: true,
-            },
-            () => {
-              // callback
-              setHandled(false)
-            }
-          )
-        }
-        setHandled(true)
+      const { isSuccess, error } = await userRegister({ name, password })
+      if (isSuccess) {
+        triggerModal({
+          type: 'confirm',
+          title: 'Register Succeeded!',
+          escription: 'click `Get it` to continue',
+          onConfirm: () => {
+            setConfirmRedirect(true)
+          },
+        })
+      } else {
+        const err = error as any
+        triggerModal({
+          type: 'confirm',
+          title: err.title,
+          description: err.description,
+        })
       }
     },
-    [handled, toastManager]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [setConfirmRedirect]
   )
 
   return [onLoginSubmit, onRegisterSubmit]
 }
 
-const renderMobileUserPage = withToastManager((props: ToastManagerProps) => {
-  const [onLoginSubmit, onRegisterSubmit] = useUserActions(props.toastManager)
-  return (
-    <MobileLayout
-      header={<MobileNavHeader leftLink="/" />}
-      footer={null}
-      showFooter={false}
-    >
-      <MobileContainerFrame>
-        <RegisterForm onLoginSubmit={onLoginSubmit} onRegisterSubmit={onRegisterSubmit} />
-      </MobileContainerFrame>
-    </MobileLayout>
+const NewUser: React.FC = (props: any) => {
+  const [triggerModal, createModal] = ModalFactory.useModal()
+  // states
+  const [confirmRedirect, setConfirmRedirect] = useState(false)
+  const [onLoginSubmit, onRegisterSubmit] = useUserActions(
+    triggerModal,
+    setConfirmRedirect
   )
-})
 
-const renderDesktopUserPage = withToastManager((props: ToastManagerProps) => {
-  const [onLoginSubmit, onRegisterSubmit] = useUserActions(props.toastManager)
+  const qs = parseQuery(props.location.search)
+  const refURL = qs['ref'] || '/'
   return (
-    <DesktopLayout
-      header={<DesktopHomeHeader hideUserBar={true} user={{ isLogin: false }} />}
-    >
-      <ContainerFrame>
-        <FormWrapper>
-          <RegisterForm
-            onLoginSubmit={onLoginSubmit}
-            onRegisterSubmit={onRegisterSubmit}
-          />
-        </FormWrapper>
-      </ContainerFrame>
-    </DesktopLayout>
-  )
-})
-
-const ToastMessageWrapper: React.FC = (props: any) => {
-  return (
-    <ToastMessage
-      isSuccess={props.appearance === 'info'}
-      title={props.children.title}
-      subTitle={props.children.subTitle}
-    />
-  )
-}
-const NewUser: React.FC = () => {
-  return (
-    <ToastProvider
-      placement="bottom-center"
-      components={{ Toast: ToastMessageWrapper }}
-      autoDismissTimeout={2000}
-    >
-      {isMobile ? renderMobileUserPage() : renderDesktopUserPage()}
-    </ToastProvider>
+    <div>
+      {confirmRedirect ? <Redirect to={refURL} /> : null}
+      {isMobile ? (
+        <MobileLayout
+          header={<MobileNavHeader leftLink="/" />}
+          footer={null}
+          showFooter={false}
+        >
+          <MobileContainerFrame>
+            <RegisterForm
+              onLoginSubmit={onLoginSubmit}
+              onRegisterSubmit={onRegisterSubmit}
+            />
+          </MobileContainerFrame>
+        </MobileLayout>
+      ) : (
+        <DesktopLayout
+          header={<DesktopHomeHeader hideUserBar={true} user={{ isLogin: false }} />}
+        >
+          <ContainerFrame>
+            <FormWrapper>
+              <RegisterForm
+                onLoginSubmit={onLoginSubmit}
+                onRegisterSubmit={onRegisterSubmit}
+              />
+            </FormWrapper>
+          </ContainerFrame>
+        </DesktopLayout>
+      )}
+      {createModal()}
+    </div>
   )
 }
 

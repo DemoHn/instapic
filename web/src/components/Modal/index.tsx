@@ -22,7 +22,7 @@ const CustomModal: React.FC<ModalProps> = (props, ref) => {
 
   useImperativeHandle(ref, () => ({
     trigger: () => {
-      setOpen(true)
+      setOpen(!open)
     },
   }))
 

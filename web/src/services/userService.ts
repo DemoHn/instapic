@@ -17,19 +17,25 @@ export interface UserResponse {
   userword: string
 }
 export function userLogin(req: UserRequest): Promise<Response<TokenResponse>> {
-  return axios.post('/api/v1.0/users/login', req).then(resp => {
-    const respData = resp.data as TokenResponse
-    storeToken(respData.token)
-    return { isSuccess: true, data: respData }
-  })
+  return axios
+    .post('/api/v1.0/users/login', req)
+    .then(resp => {
+      const respData = resp.data as TokenResponse
+      storeToken(respData.token)
+      return handleSuccess<TokenResponse>(resp)
+    })
+    .catch(err => handleError(err))
 }
 
 export function userRegister(req: UserRequest): Promise<Response<TokenResponse>> {
-  return axios.post('/api/v1.0/users/register', req).then(resp => {
-    const respData = resp.data as TokenResponse
-    storeToken(respData.token)
-    return { isSuccess: true, data: respData }
-  })
+  return axios
+    .post('/api/v1.0/users/register', req)
+    .then(resp => {
+      const respData = resp.data as TokenResponse
+      storeToken(respData.token)
+      return handleSuccess<TokenResponse>(resp)
+    })
+    .catch(err => handleError(err))
 }
 
 export function logout(): Promise<any> {
@@ -41,6 +47,7 @@ export function logout(): Promise<any> {
       removeToken()
       return resp.data
     })
+    .catch(err => handleError(err))
 }
 
 export function getUser(): Promise<Response<UserResponse>> {
@@ -49,7 +56,7 @@ export function getUser(): Promise<Response<UserResponse>> {
       headers: getAuthHeader(),
     })
     .then(data => handleSuccess<UserResponse>(data))
-    .catch(err => handleError<UserResponse>(err))
+    .catch(err => handleError(err))
 }
 
 export function validateUserword(userword: string): Promise<Response<UserResponse>> {

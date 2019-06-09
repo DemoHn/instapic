@@ -43,7 +43,7 @@ class AuthException(BaseException):
 # sql
 class SQLExecutionException(BaseException):
   def __init__(self, tag):
-    super().__init__('sql execution error: %s', tag)
+    super().__init__('sql execution error: %s' % tag)
     self.status_code = 500
     self.error_code = 20000
 
