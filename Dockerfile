@@ -4,6 +4,7 @@ FROM node:11-alpine AS frontend-builder
 WORKDIR /srv
 COPY web .
 
+RUN npm config set unsafe-perm true
 RUN npm install -g yarn
 RUN yarn && yarn build
 
