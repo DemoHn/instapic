@@ -56,7 +56,9 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && yarn clean:dist && yarn move:dist",
+    "clean:dist": "rm -rf ../core/static && mkdir -p ../core/static",
+    "move:dist": "mv build/static/** build/ && rm -r build/static && mv build/** ../core/static",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint --ext .ts,.tsx src",
