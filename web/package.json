@@ -56,7 +56,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build && yarn clean:dist && yarn move:dist",
+    "build": "react-scripts build",    
     "clean:dist": "rm -rf ../core/static && mkdir -p ../core/static",
     "move:dist": "mv build/static/** build/ && rm -r build/static && mv build/** ../core/static",
     "test": "react-scripts test",
