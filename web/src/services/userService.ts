@@ -40,12 +40,12 @@ export function userRegister(req: UserRequest): Promise<Response<TokenResponse>>
 
 export function logout(): Promise<any> {
   return axios
-    .get('/api/v1.0/user/logout', {
+    .get('/api/v1.0/users/logout', {
       headers: getAuthHeader(),
     })
     .then(resp => {
       removeToken()
-      return resp.data
+      return handleSuccess(resp)
     })
     .catch(err => handleError(err))
 }

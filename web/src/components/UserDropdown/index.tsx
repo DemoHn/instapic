@@ -3,6 +3,8 @@ import { Icon, Dropdown } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
+// services
+import { logout } from '../../services/userService'
 // styles
 const DropdownFrame = styled.span`
   display: inline-block;
@@ -17,11 +19,18 @@ const Label = styled.span`
   text-align: left;
 `
 
+const LogoutFrame = styled.span`
+  color: #4183c4;
+`
 export interface UserDropdownProps {
   isLogin: boolean
   userName?: string
 }
 
+const logoutAction = async () => {
+  await logout()
+  window.location.reload()
+}
 const UserDropdown: React.FC<UserDropdownProps> = props => {
   const { isLogin, userName } = props
 
@@ -55,13 +64,13 @@ const UserDropdown: React.FC<UserDropdownProps> = props => {
             </Dropdown.Item>
             {isLogin ? (
               <Dropdown.Item>
-                <Link to="/logout">
+                <LogoutFrame onClick={() => logoutAction()}>
                   <Icon.Group>
                     <Icon name="user circle outline" />
                   </Icon.Group>
                   <IconSpace />
                   <Label>Logout</Label>
-                </Link>
+                </LogoutFrame>
               </Dropdown.Item>
             ) : null}
           </Dropdown.Menu>
