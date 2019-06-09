@@ -5,6 +5,7 @@ export interface AuthResult {
   hasResult: boolean
   isLogin: boolean
   userName: string
+  userword: string
 }
 
 export interface AuthError {
@@ -13,11 +14,16 @@ export interface AuthError {
   description: string
 }
 
+const defaultAuthResult = {
+  isLogin: false,
+  userName: '',
+  userword: '',
+}
+
 export default function useAuth(errorCallback?: (err: AuthError) => any) {
   const [authResult, setAuthResult] = useState<AuthResult>({
     hasResult: false,
-    isLogin: false,
-    userName: '',
+    ...defaultAuthResult,
   })
 
   const authErrorCallback = errorCallback || (err => {})
@@ -30,13 +36,13 @@ export default function useAuth(errorCallback?: (err: AuthError) => any) {
           hasResult: true,
           isLogin: true,
           userName: respData.name,
+          userword: respData.userword,
         }
         setAuthResult(authResult)
       } else {
         setAuthResult({
           hasResult: true,
-          isLogin: false,
-          userName: '',
+          ...defaultAuthResult,
         })
         authErrorCallback(error as AuthError)
       }
@@ -47,8 +53,7 @@ export default function useAuth(errorCallback?: (err: AuthError) => any) {
     } else {
       setAuthResult({
         hasResult: true,
-        isLogin: false,
-        userName: '',
+        ...defaultAuthResult,
       })
       authErrorCallback({
         title: 'Auth Error',

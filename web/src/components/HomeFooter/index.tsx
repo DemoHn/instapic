@@ -19,15 +19,16 @@ const HomeFooter: React.FC<HomeFooterProps> = props => {
   const [currentIndex, setCurrentIndex] = useState(defaultIndex)
   return (
     <div className="footer-frame">
-      <Link to="/">
-        <span
-          className="left-col col"
-          onClick={() => setCurrentIndex(0)}
-          data-selected={isSelected(0, currentIndex)}
-        >
+      <span
+        className="left-col col"
+        onClick={() => setCurrentIndex(0)}
+        data-selected={isSelected(0, currentIndex)}
+      >
+        <Link to="/">
           <Icon name="home" />
-        </span>
-      </Link>
+        </Link>
+      </span>
+
       <span className="middle-col col">
         <Link to="/new_post">
           <PostButton>new post</PostButton>
@@ -38,7 +39,9 @@ const HomeFooter: React.FC<HomeFooterProps> = props => {
         onClick={() => setCurrentIndex(1)}
         data-selected={isSelected(1, currentIndex)}
       >
-        <Icon name="user outline" />
+        <Link to="/users/@me">
+          <Icon name="user outline" />
+        </Link>
       </span>
     </div>
   )

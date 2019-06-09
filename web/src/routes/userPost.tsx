@@ -8,6 +8,7 @@ import HomeFooter from '../components/HomeFooter'
 import DesktopHomeHeader from '../components/DesktopHomeHeader'
 import MobilePostsContainer from '../components/MobilePostsContainer'
 import DesktopPostsContainer from '../components/DesktopPostsContainer'
+import { ModalFactory } from '../components/Modal'
 
 // layouts
 import MobileLayout from '../layouts/MobileLayout'
@@ -21,42 +22,92 @@ import useAuth from '../hooks/auth'
 
 const usePostsModel = (
   isMobile: boolean,
-  userword: string
+  userword: string,
+  triggerModal: any
 ): [() => Promise<any>, () => Promise<any>] => {
   const PAGE_LIMIT = isMobile ? 4 : 12
 
   const [posts, setPosts] = useState<PostResponse[]>([])
   const [cursor, setCursor] = useState()
+  const [retry, setRetry] = useState(0)
 
   // get posts list from backend API
   useEffect(() => {
     const fetchData = async () => {
-      const { data } = await listUserPosts(userword, PAGE_LIMIT)
-      const newPostsInfo = data as PostsResponse
-      setPosts(newPostsInfo.posts)
-      setCursor(newPostsInfo.cursor)
+      const { isSuccess, error, data } = await listUserPosts(userword, PAGE_LIMIT)
+      if (isSuccess) {
+        const newPostsInfo = data as PostsResponse
+
+        setPosts(newPostsInfo.posts)
+        setCursor(newPostsInfo.cursor)
+      } else {
+        const err = error as any
+        triggerModal({
+          type: 'confirm',
+          confirmText: 'Retry',
+          title: err.title,
+          description: err.description,
+          onConfirm: () => {
+            setRetry(retry + 1)
+          },
+        })
+      }
     }
     fetchData()
-  }, [PAGE_LIMIT, userword])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [PAGE_LIMIT, retry, userword])
 
   const onTopRefresh = useCallback(async () => {
-    const { data } = await listUserPosts(userword, PAGE_LIMIT)
-    const newPostsInfo = data as PostsResponse
-    const updatedPosts = newPostsInfo.posts
-    setPosts(updatedPosts)
-    setCursor(newPostsInfo.cursor)
-    return [true, updatedPosts]
-  }, [PAGE_LIMIT, userword])
+    const { isSuccess, error, data } = await listUserPosts(userword, PAGE_LIMIT)
+    if (isSuccess) {
+      const newPostsInfo = data as PostsResponse
+
+      setPosts(newPostsInfo.posts)
+      setCursor(newPostsInfo.cursor)
+
+      return [true, newPostsInfo.posts]
+    } else {
+      const err = error as any
+      triggerModal({
+        type: 'confirm',
+        confirmText: 'Retry',
+        title: err.title,
+        description: err.description,
+        onConfirm: () => {
+          setRetry(retry + 1)
+        },
+      })
+      return [true, []]
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [PAGE_LIMIT, retry, userword])
 
   const onBottomRefresh = useCallback(async () => {
-    const { data } = await listUserPosts(userword, PAGE_LIMIT, cursor)
-    const postInfo = data as PostsResponse
-    const hasMore = postInfo.has_more
-    const updatedPosts = posts.concat(postInfo.posts)
-    setPosts(updatedPosts)
-    setCursor(postInfo.cursor)
-    return [hasMore, updatedPosts]
-  }, [PAGE_LIMIT, cursor, posts, userword])
+    const { isSuccess, error, data } = await listUserPosts(userword, PAGE_LIMIT, cursor)
+    if (isSuccess) {
+      const newPostsInfo = data as PostsResponse
+      const hasMore = newPostsInfo.has_more
+      const newPosts = [...posts, ...newPostsInfo.posts]
+      setPosts(newPosts)
+      setCursor(newPostsInfo.cursor)
+
+      return [hasMore, newPosts]
+    } else {
+      const err = error as any
+      triggerModal({
+        type: 'confirm',
+        confirmText: 'Retry',
+        title: err.title,
+        description: err.description,
+        onConfirm: () => {
+          setRetry(retry + 1)
+        },
+      })
+      return [true, posts]
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [PAGE_LIMIT, cursor, posts, retry, userword])
 
   return [onTopRefresh, onBottomRefresh]
 }
@@ -84,60 +135,11 @@ const useUploader = (userword: string): { userName: string } => {
   return uploadUser
 }
 
-const MobileUserPostPage: React.FC<{ userword: string }> = props => {
-  const { userword } = props
-  const [onTopRefresh, onBottomRefresh] = usePostsModel(isMobile, userword)
-  const uploader = useUploader(userword)
-
-  const title = uploader.userName === '' ? '' : `${uploader.userName}'s Posts`
-  return (
-    <MobileLayout
-      header={<MobileNavHeader leftLink="/" middleComponent={<span>{title}</span>} />}
-      footer={<HomeFooter />}
-    >
-      <MobilePostsContainer
-        onInit={async () => {
-          const [hasMore, updatedPosts] = await onBottomRefresh()
-          return [hasMore, updatedPosts]
-        }}
-        onTopUpdate={async () => {
-          const [hasMore, updatedPosts] = await onTopRefresh()
-          return [hasMore, updatedPosts]
-        }}
-        onBottomUpdate={async () => {
-          const [hasMore, updatedPosts] = await onBottomRefresh()
-          return [hasMore, updatedPosts]
-        }}
-      />
-    </MobileLayout>
-  )
-}
-
 // desktop styles
 const Tag = styled.h2`
   padding-top: 20px;
 `
 
-const DesktopUserPostPage: React.FC<{ userword: string; user: any }> = props => {
-  const { userword } = props
-  const [, onBottomRefresh] = usePostsModel(false, userword)
-  const uploader = useUploader(userword)
-  return (
-    <DesktopLayout header={<DesktopHomeHeader hideUserBar={false} user={props.user} />}>
-      {uploader.userName === '' ? null : <Tag>{uploader.userName}'s Posts</Tag>}
-      <DesktopPostsContainer
-        onInit={async () => {
-          const [hasMore, updatedPosts] = await onBottomRefresh()
-          return [hasMore, updatedPosts]
-        }}
-        onUpdate={async () => {
-          const [hasMore, updatedPosts] = await onBottomRefresh()
-          return [hasMore, updatedPosts]
-        }}
-      />
-    </DesktopLayout>
-  )
-}
 export interface UserPostProps {
   match: {
     params: any
@@ -147,17 +149,81 @@ export interface UserPostProps {
   }
 }
 
+const AuthSuccessPost: React.FC<{
+  authResult: any
+  userword: any
+}> = props => {
+  const { authResult, userword } = props
+  const acUserword = userword === '@me' ? authResult.userword : userword
+  const uploader = useUploader(acUserword)
+  // modal
+  const [triggerModal, createModal] = ModalFactory.useModal()
+  const [onTopRefresh, onBottomRefresh] = usePostsModel(
+    isMobile,
+    acUserword,
+    triggerModal
+  )
+  return (
+    <div>
+      {isMobile ? (
+        <MobileLayout
+          header={
+            <MobileNavHeader
+              leftLink="/"
+              middleComponent={
+                <span>
+                  {uploader.userName === '' ? '' : `${uploader.userName}'s Posts`}
+                </span>
+              }
+            />
+          }
+          footer={<HomeFooter />}
+        >
+          <MobilePostsContainer
+            onInit={async () => {
+              const [hasMore, updatedPosts] = await onBottomRefresh()
+              return [hasMore, updatedPosts]
+            }}
+            onTopUpdate={async () => {
+              const [hasMore, updatedPosts] = await onTopRefresh()
+              return [hasMore, updatedPosts]
+            }}
+            onBottomUpdate={async () => {
+              const [hasMore, updatedPosts] = await onBottomRefresh()
+              return [hasMore, updatedPosts]
+            }}
+          />
+        </MobileLayout>
+      ) : (
+        <DesktopLayout
+          header={<DesktopHomeHeader hideUserBar={false} user={authResult} />}
+        >
+          {uploader.userName === '' ? null : <Tag>{uploader.userName}'s Posts</Tag>}
+          <DesktopPostsContainer
+            onInit={async () => {
+              const [hasMore, updatedPosts] = await onBottomRefresh()
+              return [hasMore, updatedPosts]
+            }}
+            onUpdate={async () => {
+              const [hasMore, updatedPosts] = await onBottomRefresh()
+              return [hasMore, updatedPosts]
+            }}
+          />
+        </DesktopLayout>
+      )}
+      {createModal()}
+    </div>
+  )
+}
+
 const UserPost: React.FC<UserPostProps> = ({ match, location }) => {
   const { userword } = match.params
+  // user
   const authResult = useAuth()
 
   return authResult.hasResult ? (
     authResult.isLogin ? (
-      isMobile ? (
-        <MobileUserPostPage userword={userword} />
-      ) : (
-        <DesktopUserPostPage userword={userword} user={authResult} />
-      )
+      <AuthSuccessPost userword={userword} authResult={authResult} />
     ) : (
       <Redirect
         to={{

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { isMobile, BrowserView, MobileView } from 'react-device-detect'
 
 // layouts
@@ -10,7 +10,7 @@ import MobileHomeHeader from '../components/MobileHomeHeader'
 import DesktopHomeHeader from '../components/DesktopHomeHeader'
 import MobilePostsContainer from '../components/MobilePostsContainer'
 import DesktopPostsContainer from '../components/DesktopPostsContainer'
-import Modal from '../components/Modal'
+import { ModalFactory } from '../components/Modal'
 // services
 import { getPosts, PostResponse, PostsResponse } from '../services/postService'
 
@@ -25,6 +25,7 @@ const usePostsModel = (
   const [posts, setPosts] = useState<PostResponse[]>([])
   const [cursor, setCursor] = useState()
 
+  const [retry, setRetry] = useState(0)
   // get posts list from backend API
   useEffect(() => {
     const fetchData = async () => {
@@ -35,12 +36,21 @@ const usePostsModel = (
         setPosts(newPostsInfo.posts)
         setCursor(newPostsInfo.cursor)
       } else {
-        triggerModal(error)
+        const err = error as any
+        triggerModal({
+          type: 'confirm',
+          confirmText: 'Retry',
+          title: err.title,
+          description: err.description,
+          onConfirm: () => {
+            setRetry(retry + 1)
+          },
+        })
       }
     }
     fetchData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [PAGE_LIMIT])
+  }, [PAGE_LIMIT, retry])
 
   const onTopRefresh = useCallback(async () => {
     const { isSuccess, error, data } = await getPosts(PAGE_LIMIT)
@@ -52,11 +62,20 @@ const usePostsModel = (
 
       return [true, newPostsInfo.posts]
     } else {
-      triggerModal(error)
+      const err = error as any
+      triggerModal({
+        type: 'confirm',
+        confirmText: 'Retry',
+        title: err.title,
+        description: err.description,
+        onConfirm: () => {
+          setRetry(retry + 1)
+        },
+      })
       return [true, []]
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [PAGE_LIMIT])
+  }, [PAGE_LIMIT, retry])
 
   const onBottomRefresh = useCallback(async () => {
     const { isSuccess, error, data } = await getPosts(PAGE_LIMIT, cursor)
@@ -69,49 +88,26 @@ const usePostsModel = (
 
       return [hasMore, newPosts]
     } else {
-      triggerModal(error)
-      return [true, []]
+      const err = error as any
+      triggerModal({
+        type: 'confirm',
+        confirmText: 'Retry',
+        title: err.title,
+        description: err.description,
+        onConfirm: () => {
+          setRetry(retry + 1)
+        },
+      })
+      return [true, posts]
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [PAGE_LIMIT, cursor])
+  }, [PAGE_LIMIT, retry, cursor])
 
   return [onTopRefresh, onBottomRefresh]
 }
 
-const useErrorModal = (): [(err: any, callback: any) => any, () => any] => {
-  const errorModalRef = useRef(null)
-
-  const [error, setError] = useState({
-    title: '',
-    description: '',
-  })
-
-  const renderModal = () => {
-    return (
-      <Modal
-        type="confirm"
-        ref={errorModalRef}
-        title={error.title}
-        description={error.description}
-      />
-    )
-  }
-
-  const triggerModal = (err: any) => {
-    setError(err)
-    setTimeout(() => {
-      if (errorModalRef.current) {
-        // @ts-ignore
-        errorModalRef.current.trigger()
-      }
-    }, 200)
-  }
-
-  return [triggerModal, renderModal]
-}
-
 const Home: React.FC = () => {
-  const [triggerModal, renderModal] = useErrorModal()
+  const [triggerModal, createModal] = ModalFactory.useModal()
   const [onTopRefresh, onBottomRefresh] = usePostsModel(isMobile, triggerModal)
   const authResult = useAuth()
 
@@ -152,7 +148,7 @@ const Home: React.FC = () => {
         </MobileLayout>
       </MobileView>
 
-      {renderModal()}
+      {createModal()}
     </>
   )
 }
